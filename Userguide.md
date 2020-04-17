@@ -8,8 +8,8 @@ Qiuhua Liang, Xilin Xia, Xiaodong Ming
 
 | Data      | Version | Milestone                                                    | Leading people           |
 | --------- | ------- | ------------------------------------------------------------ | ------------------------ |
-| Apr 2020  | 1.0     | First Public Release of hipims-cuda                          | Xilin Xia, Xiaodong Ming |
-| Jan 2020  | 0.9     | Python-based prepocessing and post-processing for hipims-cuda | Xiaodong Ming            |
+| Apr 2020  | 1.0.1   | First Public Release of hipims-cuda                          | Xilin Xia, Xiaodong Ming |
+| Jan 2020  | 1.0     | Python-based prepocessing and post-processing for hipims-cuda | Xiaodong Ming            |
 | July 2019 | 0.9     | Implemented drainage network model in hipims-cuda            | Qian Li                  |
 | Nov 2016  | 0.8     | Implemented multi-gpu support in hipims-cuda                 | Xilin Xia                |
 | Mar 2016  | 0.7     | Implemented Surface Reconstruction Method and Fully-implicit friction in hipims-cuda | Xilin Xia                |
