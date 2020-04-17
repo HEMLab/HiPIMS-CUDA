@@ -1,6 +1,6 @@
 # HiPIMS Manual
 
-Version 1.0
+Version 1.0.1
 
 Qiuhua Liang, Xilin Xia, Xiaodong Ming
 
@@ -170,6 +170,8 @@ more boundary conditions. The fundamental files are introduced in Table 1.
 | *times\_setup.dat* | Four values respectively indicate model start time, total time, output interval, and backup interval in seconds |  |
 | *device\_setup.dat* | Values to define the ID of GPU devices that used to run model in each subdomain. |  |
 
+*Note: The IntegratedShallowFlowSolver for landslide movement only requires the first three input files*
+
 ## 4. Model Outputs
 
 The outputs of HiPIMS include three types:
@@ -240,5 +242,6 @@ The algorithms used in the current version are documented in the following paper
 
 1. X. Xia, Q. Liang, X. Ming, J. Hou (2017) An efficient and stable hydrodynamic model with novel source term discretization schemes for overland flow and flood simulations. Water Resources Research, 53, 3730-3759.
 2. X. Xia, Q. Liang (2018) A new efficient implicit scheme for discretising the stiff friction terms in the shallow water equations. Advances in Water Resources, 117, 87-97
-3. X. Xia, Q. Liang, X. Ming (2019) A full-scale fluvial flood modelling framework based on a High-Performance Integrated hydrodynamic Modelling System (HiPIMS). Advances in Water Resources, doi: 10.1016/j.advwatres.2019.103392
-4. Q. Li, Q. Liang, X. Xia (2020), A novel 1D-2D coupled model for hydrodynamic simulation of flows in drainage networks, Advances in Water Resources, 137, 103519
+3. X. Xia, Q. Liang (2018) A new depth-averaged model for flow-like landslides over complex terrain with curvatures and steep slopes. *Engineering Geology*, 234, 174-191.
+4. X. Xia, Q. Liang, X. Ming (2019) A full-scale fluvial flood modelling framework based on a High-Performance Integrated hydrodynamic Modelling System (HiPIMS). Advances in Water Resources, doi: 10.1016/j.advwatres.2019.103392
+5. Q. Li, Q. Liang, X. Xia (2020), A novel 1D-2D coupled model for hydrodynamic simulation of flows in drainage networks, Advances in Water Resources, 137, 103519
