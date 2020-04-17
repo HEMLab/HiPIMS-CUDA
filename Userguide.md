@@ -228,7 +228,7 @@ An example of step-by-step setup a HiPIMS input object with more detailed inform
 >>> obj_in.domain_show() # show domain map
 >>> print(obj_in) # print model summary
 # write all input files for HiPIMS
->>> ob
+>>> obj_in.write_input_files()
 ```
 You can use the help function of python to view detailed documentation of hipims_io. Alternatively, you can use PyDoc to view the documentation in web browser. To do so, you need to run the following command in terminal
 ```
