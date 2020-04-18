@@ -32,7 +32,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 #%% draw inundation map with domain outline
 def mapshow(raster_obj=None, array=None, header=None, ax=None,
             figname=None, figsize=None, dpi=300, 
-            cax=True, relocate=False, scale_ratio=1, **kwargs):
+            cax=True, cax_str=None, relocate=False, scale_ratio=1, **kwargs):
     """
     Display raster data without projection
     raster_obj: a Raster object
@@ -67,8 +67,13 @@ def mapshow(raster_obj=None, array=None, header=None, ax=None,
     # of ax and the padding between cax and ax will be fixed at 0.05 inch.
     if cax==True:
         divider = make_axes_locatable(ax)
-        cax = divider.append_axes("right", size="5%", pad=0.05)
-        plt.colorbar(img, cax=cax)
+        cax = divider.append_axes("right", size="3%", pad=0.05)
+        cbar = plt.colorbar(img, cax=cax)
+        plt.yticks(fontsize='small')
+        if cax_str is not None:
+            cbar.ax.set_xlabel(cax_str, horizontalalignment='left',
+                               fontsize='small')
+            cbar.ax.xaxis.set_label_coords(0, 1.06)
     ax.axes.grid(linestyle='-.', linewidth=0.2)
     ax.set_aspect('equal', 'box')
     # save figure
@@ -261,7 +266,7 @@ def _plot_temp_figs(obj_list=None, header=None, array_3d=None,
     return fig_names
     
 #%%
-def _set_colorbar(ax,img,norm):
+def _set_colorbar(ax, img, norm):
     divider = make_axes_locatable(ax)
     cax = divider.append_axes("right", size="5%", pad=0.05)
     plt.colorbar(img, cax=cax)

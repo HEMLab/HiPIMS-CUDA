@@ -506,7 +506,7 @@ class InputHipims:
 #------------------------------------------------------------------------------
 #******************************* Visualization ********************************
 #------------------------------------------------------------------------------
-    def domain_show(self, **kwargs):
+    def domain_show(self, figname=None, dpi=None, **kwargs):
         """Show domain map of the object
         """
         fig, ax = self.Raster.mapshow(**kwargs)
@@ -522,7 +522,9 @@ class InputHipims:
             num = num+1
         legends[0] = 'Outline boundary'
         ax.legend(legends, edgecolor=None, facecolor=None, loc='best',
-                  fontsize='small')
+                  fontsize='x-small')
+        if figname is not None:
+            fig.savefig(figname, dpi=dpi)
         return fig, ax
 
     def plot_rainfall_source(self,start_date=None, method='mean'):

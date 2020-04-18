@@ -13,8 +13,12 @@ import numpy as np
 from .InputHipims import InputHipims
 from .Raster import Raster
 
-def demo_input(set_example_inputs=True):
+def demo_input(set_example_inputs=True, figname=None, dpi=200, **kwargs):
     """ A demonstration to generate a hipims input object
+    set_example_inputs: (True|False) if True, initial condition, boundary
+        condition, rainfall source, and gauge postion will be set to the input 
+        object according to sample data.
+    figname: (string) if given, a domain map will saved
     """
     dem_file = pkg_resources.resource_filename(__name__,
                                              'sample/Example_DEM.asc')
@@ -23,8 +27,11 @@ def demo_input(set_example_inputs=True):
         __set_defaul_input(obj_in)
     # show model summary print(obj_in)
     obj_in.Summary.display()
-    fig, ax = obj_in.domain_show(relocate=True, scale_ratio=1000)
+    fig, ax = obj_in.domain_show(relocate=True, scale_ratio=1000, 
+                                 cax_str='DEM (m)', **kwargs)
     ax.set_title('The Upper Lee catchment')
+    if figname is not None:
+        fig.savefig(figname, dpi=dpi)
     return obj_in
 
 def demo_raster(figname=None):
