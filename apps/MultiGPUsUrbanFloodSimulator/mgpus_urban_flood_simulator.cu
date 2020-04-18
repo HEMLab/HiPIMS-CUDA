@@ -302,7 +302,7 @@ void run(cuDataBank& bank, std::vector<int> device_list, unsigned int domain_id,
 
     //modify manning coefficient to filter large velocities
     fv::cuBinary(hU, h, u, divide);
-    fv::cuBinary(manning_coef,u,manning_coef,manning_filter);
+    //fv::cuBinary(manning_coef,u,manning_coef,manning_filter);
 
     ////forwarding the time
     time_controller.forward();
