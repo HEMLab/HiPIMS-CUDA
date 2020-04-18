@@ -1,6 +1,6 @@
 hipims_io
 --------
-Python code to process input and output files of [HiPIMS flood model](https://github.com/xiaxilin/hipims). This code follows [Google Python Style Guide](http://google.github.io/styleguide/pyguide.html).
+Python code to process input and output files of [HiPIMS flood model](https://github.com/HEMLab/hipims). This code follows [Google Python Style Guide](http://google.github.io/styleguide/pyguide.html).
 
 Python version: >=3.6. To use the full function of this package for processing raster and shapefile, gdal and pyshp are required.
 
