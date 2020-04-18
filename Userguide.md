@@ -4,35 +4,6 @@ Version 1.0.1
 
 Qiuhua Liang, Xilin Xia, Xiaodong Ming
 
-## Major version history
-
-| Data      | Version | Milestone                                                    | Leading people           |
-| --------- | ------- | ------------------------------------------------------------ | ------------------------ |
-| Apr 2020  | 1.0.1   | First Public Release of hipims-cuda                          | Xilin Xia, Xiaodong Ming |
-| Jan 2020  | 1.0     | Python-based prepocessing and post-processing for hipims-cuda | Xiaodong Ming            |
-| July 2019 | 0.9     | Implemented drainage network model in hipims-cuda            | Qian Li                  |
-| Nov 2016  | 0.8     | Implemented multi-gpu support in hipims-cuda                 | Xilin Xia                |
-| Mar 2016  | 0.7     | Implemented Surface Reconstruction Method and Fully-implicit friction in hipims-cuda | Xilin Xia                |
-| Feb 2015  | 0.6.5   | Implemented flow-like landslide movement in hipims-cuda      | Xilin Xia                |
-| Oct 2015  | 0.6     | Implemented CUDA support into GeoClasses (changed name from GeoClasses to hipims-cuda) | Xilin Xia                |
-| Nov 2014  | 0.5     | Proto-type C++ implementation using a modular code structure (GeoClasses) | Xilin Xia                |
-| Mar 2014  | 0.4     | Sediment tranport implemented in CUFLOOD (became GAST)       | Jingming Hou             |
-| Oct 2013  | 0.3     | CUDA implementation of the original version (CUFLOOD)        | Reza Amouzgar            |
-| Sep 2012  | 0.2     | OpenCL implementation of the original version (hipims-ocl)   | Luke Smith               |
-| 2008      | 0.1     | Original version in Fortran (NewChan-Flood)                  | Qiuhua Liang             |
-
-## Genealogy of HiPIMS
-
-```mermaid
-graph TD;
-	 B[NewChan Flood]--> C[hipims-ocl]
-	 B --> D[CuFlood]
-	 B --> E[GeoClasses]
-	 E --> F[hipims-cuda]
-	 D --> G[GAST]
-	 
-```
-
 ## 1. Introduction
 
 HiPIMS names for High-Performance Integrated hydrodynamic Modelling System. It uses state-of-art numerical schemes (Godunov-type finite volume) to solve the 2D shallow water equations for flood simulations. To support high-resolution flood simulations, HiPIMS is implemented on multiple GPUs (Graphics Processing Unit) using CUDA/C++ languages to achieve high-performance computing. Since HiPIMS has a modular and flexible structure, it has a great potential to be further developed for other applications in hydrological science as long as the problem can be solved on a uniform rectangular grid.
@@ -244,4 +215,3 @@ The algorithms used in the current version are documented in the following paper
 2. X. Xia, Q. Liang (2018) A new efficient implicit scheme for discretising the stiff friction terms in the shallow water equations. Advances in Water Resources, 117, 87-97
 3. X. Xia, Q. Liang (2018) A new depth-averaged model for flow-like landslides over complex terrain with curvatures and steep slopes. *Engineering Geology*, 234, 174-191.
 4. X. Xia, Q. Liang, X. Ming (2019) A full-scale fluvial flood modelling framework based on a High-Performance Integrated hydrodynamic Modelling System (HiPIMS). Advances in Water Resources, doi: 10.1016/j.advwatres.2019.103392
-5. Q. Li, Q. Liang, X. Xia (2020), A novel 1D-2D coupled model for hydrodynamic simulation of flows in drainage networks, Advances in Water Resources, 137, 103519
