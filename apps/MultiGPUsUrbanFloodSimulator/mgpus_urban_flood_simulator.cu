@@ -244,14 +244,14 @@ void run(cuDataBank& bank, std::vector<int> device_list, unsigned int domain_id,
     }
   };
 
-  auto manning_filter= [] __device__(Scalar& a, Vector& b ) ->Scalar{
-    if (norm(b) > 10.0){
-      return 2.0*a;
-    }
-    else{
-      return a;
-    }
-  };
+  //auto manning_filter= [] __device__(Scalar& a, Vector& b ) ->Scalar{
+  //  if (norm(b) > 10.0){
+  //    return 2.0*a;
+  //  }
+  //  else{
+  //    return a;
+  //  }
+  //};
 
   h.update_boundary_source(field_directory.c_str(), "h");
   hU.update_boundary_source(field_directory.c_str(), "hU");
