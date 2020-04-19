@@ -301,17 +301,20 @@ int main(){
       std::cout << "Writing output files" << std::endl;
       fv::cuUnary(hU, hUx, [] __device__(Vector& a) -> Scalar{ return a.x; });
       fv::cuUnary(hU, hUy, [] __device__(Vector& a) -> Scalar{ return a.y; });
-      raster_writer.write(h, "h", _t_out, output_directory.c_str());
-      raster_writer.write(hUx, "hUx", _t_out, output_directory.c_str());
-      raster_writer.write(hUy, "hUy", _t_out, output_directory.c_str());
+      raster_writer.write(h, "h", t_out);
+      raster_writer.write(hUx, "hUx", t_out);
+      raster_writer.write(hUy, "hUy", t_out);
       t_out += dt_out;
     }
     //***********Fuse for extremely small dt***********
     if (time_controller.dt()<0.0001) {
-        raster_writer.write(h, "h", t_out);
-        cuSimpleWriterLowPrecision(hU, "hU", t_out);
-        printf("Fuse!!!\n");
-        break;
+      fv::cuUnary(hU, hUx, [] __device__(Vector& a) -> Scalar{ return a.x; });
+      fv::cuUnary(hU, hUy, [] __device__(Vector& a) -> Scalar{ return a.y; });
+      raster_writer.write(h, "h", t_out);
+      raster_writer.write(hUx, "hUx", t_out);
+      raster_writer.write(hUy, "hUy", t_out);
+      printf("Fuse!!!\n");
+      break;
     }
     //****************************************
     if (time_controller.current() >= backup_time - t_small){
