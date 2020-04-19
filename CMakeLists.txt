@@ -23,6 +23,6 @@ message("NVCC Flags: " ${CUDA_NVCC_FLAGS})
 
 
 add_subdirectory(lib)
-add_subdirectory(apps/UrbanFloodSimulator)
-add_subdirectory(apps/MultiGPUsUrbanFloodSimulator)
+add_subdirectory(apps/cudaFloodSolver)
+add_subdirectory(apps/cudaMultiGPUsFloodSolver)
 add_subdirectory(apps/cudaIntegratedShallowFlowSolver)

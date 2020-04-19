@@ -1,14 +1,14 @@
 // ======================================================================================
-// Name                :    GeoClasses : Generic Geophysical Flow Modelling Framework
+// Name                :    High-Performance Integrated Modelling System
 // Description         :    This code pack provides a generic framework for developing 
-//                          Geophysical CFD software.
+//                          Geophysical CFD software. Legacy name: GeoClasses
 // ======================================================================================
-// Version             :    0.1 
-// Author              :    Xilin Xia (PhD candidate in Newcastle University)
+// Version             :    1.0.1 
+// Author              :    Xilin Xia
 // Create Time         :    2014/10/04
-// Update Time         :    2015/10/25
+// Update Time         :    2020/04/19
 // ======================================================================================
-// Copyright @ Xilin Xia 2015 . All rights reserved.
+// LICENCE: GPLv3 
 // ======================================================================================
 
 
@@ -151,8 +151,9 @@ int main(){
   //maximum innundated depth
   cuFvMappedField<Scalar, on_cell> h_max(h, partial);
 
-  //Velocity
-//  cuFvMappedField<Vector, on_cell> u(hU, partial);
+    //x and y components of hU
+  cuFvMappedField<Scalar, on_cell> hUx(h, partial);
+  cuFvMappedField<Scalar, on_cell> hUy(h, partial);
 
   //surface elevation eta
   cuFvMappedField<Scalar, on_cell> eta(h, partial);
@@ -177,15 +178,6 @@ int main(){
   cuFvMappedField<Scalar, on_cell> gravity(h, partial);
   //setting gravity to single value 9.81
   fv::cuUnaryOn(gravity, [] __device__ (Scalar& a) -> Scalar{return 9.81;}); 
-//  fv::cuBinary(z_gradient, gravity, gravity, [] __device__(Vector& a, Scalar& b) -> Scalar{ return b / (1.0 + dot(a, a)); });
-
-
-  //creating uniform friction coefficients field
-//  cuFvMappedField<Scalar, on_cell> manning_coef(h, partial);
-//  Scalar _manning;
-//  std::cout << "Please input Manning's coefficient" << std::endl;
-//  std::cin >> _manning;
-//  fv::cuUnaryOn(manning_coef, [=] __device__(Scalar& a) -> Scalar{ return _manning; });
 
   //update boundary to current time
   z.update_time(time_controller.current(), 0.0);
@@ -229,15 +221,6 @@ int main(){
     }
   };
 
-  //calculate the velocity
-//  auto divide = [] __device__(Vector& a, Scalar& b) ->Vector{
-//    if (b >= 1e-10){
-//      return a / b;
-//    }
-//    else{
-//      return Vector(0.0);
-//    }
-//  };
 
   std::ofstream fout;
   fout.open("output/timestep_log.txt");
@@ -254,11 +237,9 @@ int main(){
 
     //calculate the surface elevation
     fv::cuBinary(h, z, eta, [] __device__ (Scalar& a, Scalar& b) -> Scalar{return a + b;});
-//    fv::cuBinary(hU, h, u, divide); 
 
     //calculate advection
     fv::cuAdvectionMSWEsCartesian(gravity, h, z, z_gradient, hU, h_advection, hU_advection); //SRM
-    //fv::cuAdvectionSWEsCartesian(gravity, h, z, hU, h_advection, hU_advection); //HR
 
     //multiply advection with -1
     fv::cuUnaryOn(h_advection, [] __device__ (Scalar& a) -> Scalar{return -1.0*a;});
@@ -318,12 +299,11 @@ int main(){
 
     if (time_controller.current() >= t_out - t_small){
       std::cout << "Writing output files" << std::endl;
-      cuSimpleWriterLowPrecision(h, "h", t_out);
-      cuSimpleWriterLowPrecision(hU, "hU", t_out);
-      raster_writer.write(h, "h", t_out);      
-      //h.update_boundary_source("input/field/", "h");
-      //hU.update_boundary_source("input/field/", "hU");
-      //precipitation.update_data_source("input/field/", "precipitation");
+      fv::cuUnary(hU, hUx, [] __device__(Vector& a) -> Scalar{ return a.x; });
+      fv::cuUnary(hU, hUy, [] __device__(Vector& a) -> Scalar{ return a.y; });
+      raster_writer.write(h, "h", _t_out, output_directory.c_str());
+      raster_writer.write(hUx, "hUx", _t_out, output_directory.c_str());
+      raster_writer.write(hUy, "hUy", _t_out, output_directory.c_str());
       t_out += dt_out;
     }
     //***********Fuse for extremely small dt***********

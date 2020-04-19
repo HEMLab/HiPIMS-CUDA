@@ -1,14 +1,14 @@
 // ======================================================================================
-// Name                :    GeoClasses : Generic Geophysical Flow Modelling Framework
+// Name                :    High-Performance Integrated Modelling System
 // Description         :    This code pack provides a generic framework for developing 
-//                          Geophysical CFD software.
+//                          Geophysical CFD software. Legacy name: GeoClasses
 // ======================================================================================
-// Version             :    0.1 
-// Author              :    Xilin Xia (PhD candidate in Newcastle University)
+// Version             :    1.0.1 
+// Author              :    Xilin Xia
 // Create Time         :    2014/10/04
-// Update Time         :    2015/10/15
+// Update Time         :    2020/04/19
 // ======================================================================================
-// Copyright @ Xilin Xia 2015 . All rights reserved.
+// LICENCE: GPLv3 
 // ======================================================================================
 
 /*!
@@ -178,7 +178,6 @@ namespace GC{
             auto flux = cuHLLCRiemannSolverSWEs(grav, ScalarRiemannState(h_L, h_R), VectorRiemannState(h_L*u_L, h_R*u_R));
             Vector2 _hU_flux = flux.q.x*normal + flux.q.y*shear;
             Vector2 _z_flux = -0.5*(grav + centrifugal_this)*h_L*h_L*normal + 0.5*(g_this + centrifugal_this)*(_eta_this - z_this)*(_eta_this - z_this)*normal;
-            //Vector2 _z_flux = -0.5*(g_this + centrifugal_this)*h_L*h_L*normal + 0.5*(g_this + centrifugal_this)*(_eta_this - z_this)*(_eta_this - z_this)*normal;
             _h_advection += flux.h*area / volume_this;
             _hU_advection += (_hU_flux + _z_flux)*area / volume_this;
           }
@@ -197,7 +196,6 @@ namespace GC{
             auto flux = cuHLLCRiemannSolverSWEs(grav, ScalarRiemannState(h_L, h_R), VectorRiemannState(h_L*u_L, h_R*u_R));
             Vector2 _hU_flux = flux.q.x*normal + flux.q.y*shear;
             Vector2 _z_flux = -0.5*(grav + centrifugal_this)*h_L*h_L*normal + 0.5*(g_this + centrifugal_this)*(_eta_this - z_this)*(_eta_this - z_this)*normal;
-            //Vector2 _z_flux = -0.5*(g_this + centrifugal_this)*h_L*h_L*normal + 0.5*(g_this + centrifugal_this)*(_eta_this - z_this)*(_eta_this - z_this)*normal;
             _h_advection += flux.h*area / volume_this;
             _hU_advection += (_hU_flux + _z_flux)*area / volume_this;
           }
@@ -682,15 +680,6 @@ namespace GC{
           Scalar z_f = fmax(z_this, z_neib);
           Scalar h_L = fmax(0.0, h_this + z_this - z_f);
           Scalar h_R = fmax(0.0, h_neib + z_neib - z_f);
-          if(index == 0 && i == 3){
-         //   printf("%f %f %f %f %f\n", h_L, h_R, z_f, u_L.x, u_R.x);
-          }
-        //  if(index == 0 && i == 0){
-        //    h_R = 0.0;
-        //  }
-        //  if(index == 0 && i == 2){
-        //    h_R = 0.0;
-        //  }
           auto flux = cuHLLCRiemannSolverSWEs(g, ScalarRiemannState(h_L, h_R), VectorRiemannState(h_L*u_L, h_R*u_R));
           Vector2 _hU_flux = flux.q.x*normal + flux.q.y*shear;
           Vector2 _z_flux = -0.5*g*h_L*h_L*normal;
@@ -811,7 +800,6 @@ namespace GC{
           Scalar _h_flux = (1.0 - Tr)*flux_relaxation.h + Tr*flux.h;
           Vector2 _hU_flux = (1.0 - Tr)*(flux_relaxation.q.x*normal + flux_relaxation.q.y*shear) + Tr*(flux.q.x*normal + flux.q.y*shear);
           Vector2 _z_flux = -0.5*g*h_L*h_L*normal;
-          //Vector2 _z_flux = 0.5*g*(h_L + h_this)*(z_f - z_this)*normal;
           _h_advection += _h_flux*area / volume;
           _hU_advection += (_hU_flux + _z_flux)*area / volume;
         }
@@ -844,104 +832,6 @@ namespace GC{
         hU_advection.data.dev_ptr());
     }
 
-/*    __global__ void cuAdvectionMSWEsCartesianKernel(Scalar* gravity, Scalar* h, Scalar* _h_bound, Scalar* z, Scalar* _z_bound, Vector* z_gradient, Vector* hU, Vector* _hU_bound, unsigned int phi_size, ShortDualHandle* cell_neigbours, unsigned int cell_neighbours_length, Scalar* cell_volume, Scalar* h_advection, Vector* hU_advection){
-
-      unsigned int index = blockDim.x * blockIdx.x + threadIdx.x;
-      Scalar h_small = 1e-10;
-      Vector2 face_normal[4];
-      Vector2 face_shear[4];
-      face_normal[0] = Vector2(0.0, -1.0);
-      face_normal[1] = Vector2(1.0, 0.0);
-      face_normal[2] = Vector2(0.0, 1.0);
-      face_normal[3] = Vector2(-1.0, 0.0);
-      face_shear[0] = Vector2(1.0, 0.0);
-      face_shear[1] = Vector2(0.0, 1.0);
-      face_shear[2] = Vector2(-1.0, 0.0);
-      face_shear[3] = Vector2(0.0, -1.0);
-      while (index < phi_size){
-        Scalar g = gravity[index];
-        Scalar h_this = h[index];
-        Scalar z_this = z[index];
-        Vector2 _z_gradient_this = z_gradient[index];
-        Scalar eta_this = h_this + z_this;
-        Vector2 hU_this = hU[index];
-        Vector2 u_this = 0.0;
-        if (h_this < h_small){
-          u_this = 0.0;
-        }
-        else{
-          u_this = hU_this / h_this;
-        }
-        Scalar volume = cell_volume[index];
-        Scalar area = sqrt(volume);
-        Scalar _h_advection(0.0);
-        Scalar _h_advection_constraint(0.0);
-        Vector2 _hU_advection(0.0, 0.0);
-        for (Flag i = 0; i < 4; ++i){
-          Vector2 normal = face_normal[i];
-          Vector2 shear = face_shear[i];
-          ShortDualHandle neib = cell_neigbours[i*cell_neighbours_length + index];
-          Scalar h_neib = 0.0;
-          Scalar z_neib = 0.0;
-          Vector2 hU_neib = 0.0;
-          Vector2 _z_gradient_neib = 0.0;
-          if (!neib.is_boundary()){
-            Flag id_neib = neib.get_global_id();
-            h_neib = h[id_neib];
-            z_neib = z[id_neib];
-            hU_neib = hU[id_neib];
-            _z_gradient_neib = z_gradient[id_neib];
-          }
-          else{
-            Flag id_boundary = neib.get_global_id();
-            h_neib = _h_bound[id_boundary];
-            z_neib = _z_bound[id_boundary];
-            hU_neib = _hU_bound[id_boundary];
-          }
-          if (h_this < h_small && h_neib < h_small){
-            _hU_advection += -0.5*g*eta_this*z_this*normal*area / volume;
-            continue;
-          }
-          Scalar eta_neib = z_neib + h_neib;
-          Vector2 u_neib = 0.0;
-          if (h_neib < h_small){
-            u_neib = 0.0;
-          }
-          else{
-            u_neib = hU_neib / h_neib;
-          }
-          Vector2 direction_this = 0.5*normal*area;
-          Vector2 direction_neib = -0.5*normal*area;
-          Scalar _z_this = z_this + dot(_z_gradient_this, direction_this);
-          Scalar _z_neib = z_neib + dot(_z_gradient_neib, direction_neib);
-          Scalar z_f = fmax(z_this, z_neib);
-          Scalar h_L = fmax(0.0, eta_this - z_f);
-          Scalar h_R = fmax(0.0, eta_neib - z_f);
-          Scalar delta_z = 0.0;
-          if (h_neib < h_small || h_neib > 10 * h_this){
-            delta_z = fmax(0.0, z_f - eta_this);
-          }
-          else{
-            delta_z = fmax(0.0, fmin(_z_neib - _z_this, z_f - eta_this));
-          }
-          Scalar eta_L = h_L + z_f - delta_z;
-          Scalar eta_R = h_R + z_f - delta_z;
-          z_f = z_f - delta_z;
-          Vector2 u_L(dot(u_this, normal), dot(u_this, shear));
-          Vector2 u_R(dot(u_neib, normal), dot(u_neib, shear));
-          auto flux = cuHLLCRiemannSolverMSWEs(g, z_f, ScalarRiemannState(h_L, h_R), ScalarRiemannState(eta_L, eta_R), VectorRiemannState(u_L, u_R));
-          Scalar _h_flux = flux.h;
-          Vector2 _hU_flux = (flux.q.x*normal + flux.q.y*shear);
-          Vector2 _z_flux = -0.5*g*(eta_this + eta_R)*(z_this - z_f)*normal;
-          _h_advection += _h_flux*area / volume;
-          _hU_advection += (_hU_flux + _z_flux)*area / volume;
-        }
-        h_advection[index] = _h_advection;
-        hU_advection[index] = _hU_advection;
-        __syncthreads();
-        index += blockDim.x * gridDim.x;
-      }
-    }   // */
 
     __global__ void cuAdvectionMSWEsCartesianKernel(Scalar* gravity, Scalar* h, Scalar* _h_bound, Scalar* z, Scalar* _z_bound, Vector* z_gradient, Vector* hU, Vector* _hU_bound, unsigned int phi_size, ShortDualHandle* cell_neigbours, unsigned int cell_neighbours_length, Scalar* cell_volume, Scalar* h_advection, Vector* hU_advection){
 
@@ -998,7 +888,6 @@ namespace GC{
             g_neib = g_this;
             h_neib = _h_bound[id_boundary];
             z_neib = _z_bound[id_boundary];
-            //z_neib = z_this; //This is important for accuracy at outlet
             hU_neib = _hU_bound[id_boundary];
           }
           if (h_this < h_small && h_neib < h_small){
@@ -1033,7 +922,6 @@ namespace GC{
           Vector2 u_R(dot(u_neib, normal), dot(u_neib, shear));
           Scalar g = 0.5*(g_this + g_neib);
           auto flux = cuHLLCRiemannSolverSWEs(g, ScalarRiemannState(h_L, h_R), VectorRiemannState(h_L*u_L, h_R*u_R));
-          //auto flux = cuLaxFriedrichsRiemannSolverSWEs(g, ScalarRiemannState(h_L, h_R), VectorRiemannState(h_L*u_L, h_R*u_R));
           Scalar _h_flux = flux.h;
           Vector2 _hU_flux = (flux.q.x*normal + flux.q.y*shear);
           if (h_neib < h_small){
@@ -1130,7 +1018,6 @@ namespace GC{
             g_neib = g_this;
             h_neib = _h_bound[id_boundary];
             z_neib = _z_bound[id_boundary];
-            //z_neib = z_this; //This is important for accuracy at outlet
             hU_neib = _hU_bound[id_boundary];
           }
           if (h_this < h_small && h_neib < h_small){
@@ -1175,8 +1062,6 @@ namespace GC{
           }
           z_f -= delta_z;
           Scalar eta_f = z_f + h_L;
-          //Vector2 _z_flux = 0.5*g*(h_L + h_this)*(z_f - z_this)*normal;
-          //centrifugal_this = 0.0;
           Vector2 _z_flux = -0.5*(g + centrifugal_this)*h_L*h_L*normal + (g_this + centrifugal_this)*h_this*eta_f*normal;
           _h_advection += _h_flux*area / volume;
           _hU_advection += (_hU_flux + _z_flux)*area / volume;
@@ -1238,13 +1123,6 @@ namespace GC{
           Scalar _eta_this = eta_this + dot(grad_eta_this, direction_this);
           Scalar _z_this = _eta_this - _h_this;
           Vector2 _u_this = u_this + dot(grad_u_this, direction_this);
-//          Vector2 _u_this = 0.0;
-//          if (_h_this > 1e-10){
-//            _u_this = _hU_this / _h_this;
-//          }
-//          else{
-//            _u_this = 0.0;
-//          }
           ShortDualHandle neib = cell_neigbours[i*cell_neighbours_length + index];
           if (!neib.is_boundary()){
             Flag id_neib = neib.get_global_id();
@@ -1261,13 +1139,6 @@ namespace GC{
             Scalar _eta_neib = eta_neib + dot(grad_eta_neib, direction_neib);
             Scalar _z_neib = _eta_neib - _h_neib;
             Vector2 _u_neib = u_neib + dot(grad_u_neib, direction_neib);
-//            Vector2 _u_neib = 0.0;
-//            if (_h_neib > 1e-10){
-//              _u_neib = _hU_neib / _h_neib;
-//            }
-//            else{
-//              _u_neib = 0.0;
-//            }
             Scalar grav = (g_this + g_neib) / 2.0;
             Scalar z_face = fmax(_z_this, _z_neib);
             Scalar h_L = fmax(_h_this + _z_this - z_face, 0.0);
@@ -1277,12 +1148,6 @@ namespace GC{
             auto flux = cuHLLCRiemannSolverSWEs(grav, ScalarRiemannState(h_L, h_R), VectorRiemannState(h_L*u_L, h_R*u_R));
             Vector2 _hU_flux = flux.q.x*normal + flux.q.y*shear;
             Vector2 _z_flux = -0.5*grav*h_L*h_L*normal + 0.5*g_this*(_eta_this - z_this)*(_eta_this - z_this)*normal;
-//            if (index == 31495){
-//              printf("%d q:%e m_x:%e m_y%e z_x:%e z_y:%e\n", i, flux.h, _hU_flux.x, _hU_flux.y, _z_flux.x, _z_flux.y);
-//              printf("%d u_L:%e v_L:%e u_R:%e v_R:%e\n", i, _u_this.x, _u_this.y, _u_neib.x, _u_neib.y);
-//              printf("%d h_L:%e h_R:%e qx_L:%e qy_L:%e qx_R:%e qy_R:%e\n",i, _h_this, _h_neib, _hU_this.x, _hU_this.y, _hU_neib.x, _hU_neib.y);
-//              printf("%d h_i:%e h_j:%e qx_i:%e qy_i:%e qx_j:%e qy_j:%e\n",i, h_this, h_neib, hU_this.x, hU_this.y, hU_neib.x, hU_neib.y);
-//            }
             _h_advection += flux.h*area / volume_this;
             _hU_advection += (_hU_flux + _z_flux)*area / volume_this;
           }
@@ -1296,13 +1161,6 @@ namespace GC{
             Scalar h_L = fmax(_h_this + _z_this - z_face, 0.0);
             Scalar h_R = fmax(h_bound + z_bound - z_face, 0.0);
             Vector2 u_bound = _u_bound[id_boundary];
-//            Vector2 u_bound = 0.0;
-//            if (h_bound > 1e-10){
-//              u_bound = hU_bound / h_bound;
-//            }
-//            else{
-//              u_bound = 0.0;
-//            }
             Vector2 u_L(dot(_u_this, normal), dot(_u_this, shear));
             Vector2 u_R(dot(u_bound, normal), dot(u_bound, shear));
             auto flux = cuHLLCRiemannSolverSWEs(grav, ScalarRiemannState(h_L, h_R), VectorRiemannState(h_L*u_L, h_R*u_R));
@@ -1362,17 +1220,6 @@ namespace GC{
     void cuAdvectionNSWEs2ndCartesian(cuFvMappedField<Scalar, on_cell>& gravity, cuFvMappedField<Scalar, on_cell>& h, cuFvMappedField<Scalar, on_cell>& z, cuFvMappedField<Vector, on_cell>& hU, cuFvMappedField<Vector, on_cell>& h_gradient, cuFvMappedField<Vector, on_cell>& eta_gradient, cuFvMappedField<Tensor, on_cell>& hU_gradient, cuFvMappedField<Scalar, on_cell>& h_advection, cuFvMappedField<Vector, on_cell>& hU_advection){
 
       auto mesh = h.mesh;
-
-//      cuAdvectionNSWEsOrderReducerSimCartesianKernel << <BLOCKS_PER_GRID, THREADS_PER_BLOCK >> >(
-//        h.data.dev_ptr(),
-//        h_gradient.data.dev_ptr(),
-//        eta_gradient.data.dev_ptr(),
-//        hU_gradient.data.dev_ptr(),
-//        h.data.size(),
-//        mesh->cell_neighbours.dev_ptr(),
-//        mesh->cell_neighbours.length()
-//        );
-
 
       cuAdvectionNSWEs2ndCartesianKernel << <BLOCKS_PER_GRID, THREADS_PER_BLOCK >> >(gravity.data.dev_ptr(), 
       gravity.boundary_value.dev_ptr(), 
@@ -1565,20 +1412,8 @@ __global__ void cuAdvectionSWEsRFGeorgeCartesianKernel(Scalar* gravity, Scalar* 
           Vector2 u_L(dot(u_this, normal), dot(u_this, shear));
           Vector2 u_R(dot(u_neib, normal), dot(u_neib, shear));
           Scalar g = 0.5*(g_this + g_neib);
-         // if(index == 0 && i == 0){
-         //   h_R = 0.0;
-         // }
-         // if(index == 0 && i == 2){
-         //   h_R = 0.0;
-         // }
           auto flux = cuGeorgeRiemannSolverSWEs(g, ScalarRiemannState(h_L, h_R), VectorRiemannState(h_L*u_L, h_R*u_R), ScalarRiemannState(z_L, z_R));
           Scalar _h_flux = flux.h;
-          //Hacking open boundary condition
-          //if(neib.is_boundary() && fabs(h_L - h_R) < 1e-10 && fabs(u_L.x - u_R.x) < 1e-10){
-          //  _h_flux = h_L*u_L.x;
-          //  flux.q.x = h_L*u_L.x*u_L.x;
-          //  flux.q.y = h_L*u_L.x*u_L.y;
-          //} 
           Vector2 _hU_flux = (flux.q.x*normal + flux.q.y*shear);
           if(i == 0){
             hU_NS[index].y = flux.h;
@@ -1592,9 +1427,6 @@ __global__ void cuAdvectionSWEsRFGeorgeCartesianKernel(Scalar* gravity, Scalar* 
           if(i == 3){
             hU_EW[index].y = flux.h;
           }
-          //if(index == 80 && i == 0){
-          //  printf("%f %f %f %f\n", h_L, h_R, u_L.x, u_R.x);
-          //}
           _h_advection += _h_flux*area / volume;
           _hU_advection += _hU_flux*area / volume;
         }

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-set(EXE cudaIntegratedShallowFlowSolver)
+set(EXE hipims-landslide)
 set(SRCS cuda_integrated_shallow_flow_solver.cu)
 
 #set (CUDA_NVCC_FLAGS "-arch=sm_20 -Xptxas=v")

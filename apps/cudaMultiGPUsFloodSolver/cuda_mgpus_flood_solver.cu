@@ -1,14 +1,14 @@
 // ======================================================================================
-// Name                :    GeoClasses : Generic Geophysical Flow Modelling Framework
+// Name                :    High-Performance Integrated Modelling System
 // Description         :    This code pack provides a generic framework for developing 
-//                          Geophysical CFD software.
+//                          Geophysical CFD software. Legacy name: GeoClasses
 // ======================================================================================
-// Version             :    0.1 
-// Author              :    Xilin Xia (PhD candidate in Newcastle University)
+// Version             :    1.0.1 
+// Author              :    Xilin Xia
 // Create Time         :    2014/10/04
-// Update Time         :    2015/10/25
+// Update Time         :    2020/04/19
 // ======================================================================================
-// Copyright @ Xilin Xia 2015 . All rights reserved.
+// LICENCE: GPLv3 
 // ======================================================================================
 
 
@@ -259,11 +259,6 @@ void run(cuDataBank& bank, std::vector<int> device_list, unsigned int domain_id,
   std::ofstream fout;
   fout.open((output_directory + "timestep_log.txt").c_str());
 
-  //double total_runtime = 0.0;
-  //cudaEvent_t start, stop;
-  //cudaEventCreate(&start);
-  //cudaEventCreate(&stop);
-
   //Main loop
   do{
 
@@ -351,25 +346,13 @@ void run(cuDataBank& bank, std::vector<int> device_list, unsigned int domain_id,
       time_controller.set_dt(dt);
     }
 
-    //cudaEventRecord(stop);
-    //cudaEventSynchronize(stop);
-
-    //float elapsed_time = 0.0;
-    //cudaEventElapsedTime(&elapsed_time, start, stop);
-    //total_runtime += elapsed_time;
-
     if (time_controller.current() >= _t_out - t_small){
       printf("Writing output files\n");
-      //cuSimpleWriterLowPrecision(h, "h", _t_out, output_directory.c_str());
-      //cuSimpleWriterLowPrecision(hU, "hU", _t_out, output_directory.c_str());
       fv::cuUnary(hU, hUx, [] __device__(Vector& a) -> Scalar{ return a.x; });
       fv::cuUnary(hU, hUy, [] __device__(Vector& a) -> Scalar{ return a.y; });
       raster_writer.write(h, "h", _t_out, output_directory.c_str());
       raster_writer.write(hUx, "hUx", _t_out, output_directory.c_str());
       raster_writer.write(hUy, "hUy", _t_out, output_directory.c_str());
-      //h.update_boundary_source(field_directory.c_str(), "h");
-      //hU.update_boundary_source(field_directory.c_str(), "hU");
-      //precipitation.update_data_source(field_directory.c_str(), "precipitation");
       _t_out += dt_out;
     }
 
@@ -379,12 +362,6 @@ void run(cuDataBank& bank, std::vector<int> device_list, unsigned int domain_id,
       cuBackupWriter(hU, "hU_backup_", _backup_time, output_directory.c_str());
       _backup_time += backup_interval;
     }
-
- //   if (time_controller.current() >= _cooldown_time - t_small){
- //     printf("sleep for 60 seconds to let the GPU cool down\n");
- //     sleep(60);
- //     _cooldown_time += cooldown_interval;
- //   }
 
   } while (!time_controller.is_end());
 
@@ -413,18 +390,15 @@ int main(){
     t_all = GPU_Time_Values[1];
     dt_out = GPU_Time_Values[2];
     backup_interval = GPU_Time_Values[3];
-//    cooldown_interval = GPU_Time_Values[4];
     std::cout << "Current time: " << t_current << "s" << std::endl;
     std::cout << "Total time: " << t_all << "s" << std::endl;
     std::cout << "Output time interval: " << dt_out << "s" << std::endl;
     std::cout << "Backup interval: " << backup_interval << "s" << std::endl;
-//    std::cout << "Cooldown interval: " << cooldown_interval << "s" << std::endl;
   }
   //---------------------
 
   t_out = t_current + dt_out;
   backup_time = t_current + backup_interval;
-//  cooldown_time = t_current + cooldown_interval;
 
   int dev_count;
   cudaGetDeviceCount(&dev_count);

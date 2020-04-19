@@ -1,14 +1,14 @@
 // ======================================================================================
-// Name                :    GeoClasses : Generic Geophysical Flow Modelling Framework
+// Name                :    High-Performance Integrated Modelling System
 // Description         :    This code pack provides a generic framework for developing 
-//                          Geophysical CFD software.
+//                          Geophysical CFD software. Legacy name: GeoClasses
 // ======================================================================================
-// Version             :    0.1 
-// Author              :    Xilin Xia (PhD candidate in Newcastle University)
+// Version             :    1.0.1
+// Author              :    Xilin Xia
 // Create Time         :    2014/10/04
-// Update Time         :    2015/10/25
+// Update Time         :    2020/04/19
 // ======================================================================================
-// Copyright @ Xilin Xia 2015 . All rights reserved.
+// LICENCE: GPLv3 
 // ======================================================================================
 
 
@@ -225,9 +225,6 @@ int main(){
   cuSimpleWriterLowPrecision(hU, "hU", time_controller.current());
   cuSimpleWriterLowPrecision(eta, "elev", time_controller.current());
 
-//  std::ofstream log;
-//  log.open("log.txt");
-
   double total_runtime = 0.0;
   cudaEvent_t start, stop;
   cudaEventCreate(&start);
@@ -327,7 +324,6 @@ int main(){
 
     //calculate advection
     fv::cuAdvectionNSWEs2ndRobustCurv(gravity, centrifugal, h, z, u, h_grad, eta_grad, u_grad, h_advection, hU_advection);
-//    fv::cuAdvectionNSWEs2nd(gravity, h, z, u, h_grad, eta_grad, u_grad, h_advection, hU_advection);
 
     //multiply advection with -1
     fv::cuUnaryOn(h_advection, [] __device__ (Scalar& a) -> Scalar{return -1.0*a;});
@@ -388,7 +384,6 @@ int main(){
 
     //calculate advection
     fv::cuAdvectionNSWEs2ndRobustCurv(gravity, centrifugal, h, z, u, h_grad, eta_grad, u_grad, h_advection, hU_advection);
-//    fv::cuAdvectionNSWEs2nd(gravity, h, z, u, h_grad, eta_grad, u_grad, h_advection, hU_advection);
 
     //multiply advection with -1
     fv::cuUnaryOn(h_advection, [] __device__ (Scalar& a) -> Scalar{return -1.0*a;});
@@ -426,27 +421,10 @@ int main(){
     }
     fv::cuEulerIntegrator(hU, friction_force, time_controller.dt(), time_controller.current());
 
-/*    //calculate an overall momentum flux
-    fv::cuBinary(hU_advection_old, hU_advection, hU_advection, [] __device__(Vector& a, Vector& b) -> Vector{ return (a + b) / 2.0; });
-    fv::cuBinary(friction_force, hU_advection, hU_advection, [] __device__(Vector& a, Vector& b) -> Vector{ return a + b; });
-    //calculate an overall mass flux
-    fv::cuBinary(h_advection_old, h_advection, h_advection, [] __device__(Scalar& a, Scalar& b) -> Scalar{ return (a + b) / 2.0; });
-    //filter mass flux to avoid fake mass flux
-    if (filter_mass_flux){
-      fv::cuBinaryOn(h_advection, hU_advection, filter2);
-    }
-
-//    fv::cuEulerIntegrator(h_old, h_advection_old, time_controller.dt()/2, time_controller.current());
-    fv::cuEulerIntegrator(h_old, h_advection, time_controller.dt(), time_controller.current()); //*/
-
-    //Write updated values h
-//    fv::cuBinaryOn(h, h_old, [] __device__(Scalar& a, Scalar& b) -> Scalar{ return b; });
 
     h.update_boundary_values();
     h.update_time(time_controller.current(), time_controller.dt()); 
 
-//    h.boundary_value.sync();
-//    std::cout << (h.boundary_value.host_ptr())[0] << std::endl;
 
     //forwarding the time
     time_controller.forward();
