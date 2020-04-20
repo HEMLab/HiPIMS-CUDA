@@ -7,7 +7,7 @@ GPUs (Graphics Processing Unit) using CUDA/C++ languages to achieve high-perform
 
 # Contact
 
-The official version of HiPIMS is maintained by the [Hydro-Environmental Modelling Labarotory](www.hemlab.org) at Loughborough University. Please contact Qiuhua Liang (q.liang@lboro.ac.uk) for more information.
+The official version of HiPIMS is maintained by the [Hydro-Environmental Modelling Labarotory](http://www.hemlab.org) at Loughborough University. Please contact Qiuhua Liang (q.liang@lboro.ac.uk) for more information.
 
 # License
 
