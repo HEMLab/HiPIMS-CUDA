@@ -24,7 +24,7 @@
 #include <functional>
 #include <cuda_runtime_api.h>
 #include <cuda.h>
-#include <unistd.h>
+//#include <unistd.h>
 
 //Header file for barrier
 #include "barrier.h"
