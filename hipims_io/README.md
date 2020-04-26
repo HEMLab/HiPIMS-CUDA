@@ -13,7 +13,7 @@ A quick demonstration to setup a HiPIMS input object with a sample DEM:
 import hipims_io as hp
 obj_in = hp.demo_input() # create an input object and show domain map
 ```
-An step-by-step tutorial to setup a HiPIMS input object with sample data:
+A step-by-step tutorial to setup a HiPIMS input object with sample data:
 
 
 ```
@@ -24,7 +24,7 @@ import hipims_io as hp
 obj_dem, model_data = hp.get_sample_data() # get sample data
 case_folder = os.getcwd() # use the current path as a case folder
 # create a single-gpu input object
-obj_in = InputHipims(dem_data=obj_dem, num_of_sections=1, case_folder=case_folder)
+obj_in = hp.InputHipims(dem_data=obj_dem, num_of_sections=1, case_folder=case_folder)
 
 # set a initial water depth of 0.5 m
 obj_in.set_parameter('h0', 0.5)

@@ -11,12 +11,11 @@ Created on Wed Apr  1 23:46:54 2020
 import os
 import datetime
 import warnings
-import pickle
-import gzip
 import numpy as np
 import pandas as pd
 import hipims_io.spatial_analysis as sp
 from .Raster import Raster
+from .indep_functions import save_object
 class OutputHipims:
     """To read and analyze otuput files from a HiPIMS flood model
     Properties (public):
@@ -28,6 +27,14 @@ class OutputHipims:
         number_of_sections: (int) the number of subdomains of the model
         header: (dict or list of dict) provide the header information
         header_list: a list of sub headers [only for multi-gpu model]
+        ref_datetime: 
+        times_simu: (dataframe) with variable 'times' (simulated time in 
+                    seconds) and 'date_times' if ref_datetime is defined.
+        gauge_values_all: (dict) 'h', 'eta', 'hU', array with values of all 
+            gauge positions, not time column
+        gauge_values: gauge timeseries summarized from a series of gauge points
+        grid_results: a list of Raster objects for gridded results
+        
     Methods (public):
         read_gauges_file: Read time seires of values at monitored gauges and
             return gauges_pos, times, values
@@ -111,6 +118,10 @@ class OutputHipims:
             times_delta = times.astype('timedelta64[s]')
             date_times = np.datetime64(self.ref_datetime)+times_delta                    
             self.times_simu['date_times'] = date_times
+        if not hasattr(self, 'gauge_values_all'):
+            self.gauge_values_all = {}
+        self.gauge_values_all[file_tag] = values
+        self.gauges_pos = gauges_pos
         return gauges_pos, times, values
     
     def read_grid_file(self, file_tag='h_0', compressed=False):
@@ -137,36 +148,39 @@ class OutputHipims:
         var_name: 'h', 'hU', 'eta'
         gauge_name: 'All' add all gauges, then gauge_ind not needed
         """
-        if not hasattr(self, 'gauge_values'):
-            self.gauge_values = {}
-        gauges_pos, _, values = self.read_gauges_file(var_name, compressed)
-        values_pd = self.times_simu.copy()
-        if gauge_ind is None:
-            gauge_ind = np.arange(gauges_pos.shape[0])
-            gauge_name = 'All'
-        if var_name == 'h': # calculation method is min
-            values = values[:, gauge_ind]
-            values_all = values+0
-            values = values.max(axis=1)
-            values_pd['values'] = values
-        elif var_name == 'hU':
-            values = values[:, :, gauge_ind]
-            values_all = values+0
-            values = values.sum(axis=2)*self.header['cellsize']
-            values_pd['values_x'] = values[0]
-            values_pd['values_y'] = values[1]
+        # read all gauge data in all positions
+        if not hasattr(self, 'gauge_values_all'):
+            self.read_gauges_file(var_name, compressed)
         else:
-            values = values[:, gauge_ind]
-            values_all = values+0
-            values_pd['values'] = values        
-        if gauge_name in self.gauge_values.keys():
-            gauge_dict = self.gauge_values[gauge_name]
-            gauge_dict[var_name] = values_pd
-        else:
-            gauge_dict = {var_name:values_pd}
-        gauge_dict[var_name+'_all'] = values_all
-        self.gauge_values[gauge_name] = gauge_dict
-        self.gauges_pos = gauges_pos
+            if var_name not in self.gauge_values_all.keys():
+                self.read_gauges_file(var_name, compressed)
+        if gauge_ind is not None:
+            # add position data for a gauge
+            values = self.gauge_values_all[var_name]+0
+            values_pd = self.times_simu.copy()
+            if not hasattr(self, 'gauge_values'):
+                self.gauge_values = {}
+            if var_name == 'h': # calculation method is min
+                one_gauge_v = values[:, gauge_ind]
+                one_gauge_v = one_gauge_v.max(axis=1)
+                values_pd['values'] = one_gauge_v
+            elif var_name == 'hU':
+                one_gauge_v = values[:, :, gauge_ind]
+                one_gauge_v = one_gauge_v.sum(axis=2)*self.header['cellsize']
+                values_pd['values_x'] = one_gauge_v[0]
+                values_pd['values_y'] = one_gauge_v[1]
+            elif var_name == 'eta':
+                if gauge_ind.size == 1:
+                    raise ValueError('gauge_ind for eta must be a scalar')
+                else:
+                    one_gauge_v = values[:, gauge_ind]
+                    values_pd['values'] = one_gauge_v
+            if gauge_name in self.gauge_values.keys():
+                gauge_dict = self.gauge_values[gauge_name]
+                gauge_dict[var_name] = values_pd
+            else:
+                gauge_dict = {var_name:values_pd}
+            self.gauge_values[gauge_name] = gauge_dict
     
     def add_grid_results(self, result_names, compressed=False):
         """Read and return Raster object to attribute 'grid_results'
@@ -234,6 +248,9 @@ class OutputHipims:
         num_of_sections = self.num_of_sections
         output_folder = self.output_folder
         input_folder = self.input_folder
+        warning_message = ('The grid header is not set, '
+                           'try _set_grid_header(asc_file) to set a '
+                           'header if it is required in your next steps')
         if num_of_sections == 1:
             if asc_file is None:
                 file_name = input_folder+'mesh/DEM.txt'
@@ -242,54 +259,30 @@ class OutputHipims:
             if os.path.exists(file_name):
                 self.header = sp.arc_header_read(file_name)
             else:
-                raise IOError('Cannot find '+asc_file)
+                warnings.warn(warning_message)
         else: #multi-gpu model
             headers = []
+            header_set = True
             for i in np.arange(num_of_sections):
-                print(i)
                 if asc_file is None:
                     file_name = input_folder[i]+'mesh/DEM.txt'
                 else:
                     file_name = output_folder[i]+asc_file
                 if os.path.exists(file_name):
                     header = sp.arc_header_read(file_name)
+                    headers.append(header)
+                    header_set = True*header_set
                 else:
-                    raise IOError('Cannot find '+file_name)
-                headers.append(header)
-            self.header_list = headers
-            self.header = _header_local2global(headers)
+                    warnings.warn(warning_message)
+                    header_set = False
+            if header_set:
+                self.header_list = headers
+                self.header = _header_local2global(headers)
     
     def save_object(self, file_name):
         """Save the object to a pickle file
         """
         save_object(self, file_name, compression=True)
-    
-def load_object(file_name):
-    """ Read a pickle file as an InputHipims object
-    """
-    #read an object file
-    try:
-        with gzip.open(file_name, 'rb') as input_file:
-            obj = pickle.load(input_file)
-    except:
-        with open(file_name, 'rb') as input_file:
-            obj = pickle.load(input_file)
-    print(file_name+' loaded')
-    return obj
-
-def save_object(obj, file_name, compression=True):
-    """ Save the object
-    """
-    # Overwrites any existing file.
-    if not file_name.endswith('.pickle'):
-        file_name = file_name+'.pickle'
-    if compression:
-        with gzip.open(file_name, 'wb') as output_file:
-            pickle.dump(obj, output_file, pickle.HIGHEST_PROTOCOL)
-    else:
-        with open(file_name, 'wb') as output_file:
-            pickle.dump(obj, output_file, pickle.HIGHEST_PROTOCOL)
-    print(file_name+' has been saved')
     
 #%% =======================Supporting functions===============================
 def _combine_gauges_data_via_ind(case_folder, num_section, file_tag):

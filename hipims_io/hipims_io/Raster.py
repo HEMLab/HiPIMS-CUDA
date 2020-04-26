@@ -13,8 +13,8 @@ import math
 import numpy as np
 #from osgeo import gdal, ogr, osr
 from scipy import interpolate
-import hipims_io.spatial_analysis as sp
-import hipims_io.grid_show as gs
+from . import spatial_analysis as sp
+from . import grid_show as gs
 #%% *******************************To deal with raster data********************
 #   ***************************************************************************    
 class Raster(object):
@@ -27,6 +27,7 @@ class Raster(object):
         header: a dict storing reference information of the grid
         extent: a tuple storing outline limits of the raster (left, right, 
         bottom, top)
+        shape: shape of the Raster value array
         extent_dict: a dictionary storing outline limits of the raster
         projection: (string) the Well-Known_Text (wkt) projection information
     
@@ -80,6 +81,11 @@ class Raster(object):
         self.projection = projection
         self.array = array
         self.header = header
+        self.shape = array.shape
+        if array.shape != (header['nrows'], header['ncols']):
+            raise ValueError(('shape of array is not consistent with '
+                              'nrows and ncols in header'))
+        self.cellsize = header['cellsize']
         self.extent = extent
         self.extent_dict = {'left':extent[0], 'right':extent[1],
                             'bottom':extent[2], 'top':extent[3]}
@@ -237,6 +243,7 @@ class Raster(object):
             Data values.
         method: {‘linear’, ‘nearest’, ‘cubic’}, optional
             Method of interpolation.
+        Alias: Interpolate_to
         """
         grid_x, grid_y = self.GetXYcoordinate()
         array_interp = interpolate.griddata(points, values, (grid_x, grid_y),
@@ -266,9 +273,10 @@ class Raster(object):
                                             (grid_x, grid_y), method=method)
         return array_interp
     
-    def grid_resample(self, newsize):
+    def grid_resample_nearest(self, newsize):
         """
         resample a grid to a new grid resolution via nearest interpolation
+        Alias: GridResample
         """
         if isinstance(newsize, dict):
             header = newsize.copy()
@@ -303,21 +311,21 @@ class Raster(object):
         """
         obj_origin = copy.deepcopy(self)
         if obj_origin.header['cellsize'] != new_header['cellsize']:
-            obj_origin = obj_origin.GridResample(new_header['cellsize'])
+            cellsize_new = new_header['cellsize']
+            obj_origin = obj_origin.grid_resample_nearest(cellsize_new)
         grid_x, grid_y = obj_origin.GetXYcoordinate()
         rows, cols = sp.map2sub(grid_x, grid_y, new_header)
         ind_r = np.logical_and(rows >= 0, rows <= new_header['nrows']-1)
         ind_c = np.logical_and(cols >= 0, cols <= new_header['ncols']-1)
         ind = np.logical_and(ind_r, ind_c)
-#        ind = np.logical_and(ind, ~np.isnan(obj_origin.array))
         array = obj_origin.array[ind]
         array = np.reshape(array, (new_header['nrows'], new_header['ncols']))
-#        array[rows[ind], cols[ind]] = obj_origin.array[ind]
         obj_output = Raster(array=array, header=new_header)
         return obj_output
 
     def to_points(self):
         """ Get X and Y coordinates of all raster cells
+        Alias: GetXYcoordinate
         return xv, yv numpy array with the same size of the raster object
         """
         ny, nx = self.array.shape
@@ -331,12 +339,12 @@ class Raster(object):
         return xv, yv
     
     def write_asc(self, output_file, EPSG=None, compression=False):
-        
         """
         write raster as asc format file 
         output_file: output file name
         EPSG: epsg code, if it is given, a .prj file will be written
         compression: logic, whether compress write the asc file as gz
+        Alias: Write_asc
         """
         sp.arcgridwrite(output_file, self.array, self.header, compression)
         if EPSG is not None:
@@ -361,6 +369,7 @@ class Raster(object):
         return:
             an osgeo raster dataset
             or a tif filename if it is written
+        Alias: To_osgeo_raster
         """
         from osgeo import gdal, osr
         if filename is None:
@@ -414,8 +423,9 @@ class Raster(object):
         figsize: the size of map
         dpi: The resolution in dots per inch
         vmin and vmax define the data range that the colormap covers
-        figname=None, figsize=None, dpi=300, vmin=None, vmax=None, 
-                cax=True, dem_array=None, relocate=False, scale_ratio=1
+        cax_str: string as the title of the colorbar
+        relocate: relocate the origin of the grid coordinates to (0, 0)
+        scale_ratio: 1|1000, axis unit 1 m or 1000 meter
         """
         fig, ax = gs.mapshow(raster_obj=self, **kwargs)
         return fig, ax
