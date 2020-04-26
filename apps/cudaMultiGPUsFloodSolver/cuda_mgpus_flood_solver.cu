@@ -324,6 +324,8 @@ void run(cuDataBank& bank, std::vector<int> device_list, unsigned int domain_id,
     ReceiveAndDispatch(h, bank, domain_id, device_list);
     CollectAndSend(hU, bank, domain_id, device_list);
     ReceiveAndDispatch(hU, bank, domain_id, device_list);
+    CollectAndSend(culmulative_depth, bank, domain_id, device_list);
+    ReceiveAndDispatch(culmulative_depth, bank, domain_id, device_list);
 
     time_controller.updateByCFL(gravity, h, hU);
 
