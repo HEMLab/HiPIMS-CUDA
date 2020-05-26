@@ -1,11 +1,14 @@
-//                          Geophysical CFD software.
 // ======================================================================================
-// Version             :    0.1 
-// Author              :    Xilin Xia (PhD candidate in Newcastle University)
+// Name                :    High-Performance Integrated Modelling System
+// Description         :    This code pack provides a generic framework for developing 
+//                          Geophysical CFD software. Legacy name: GeoClasses
+// ======================================================================================
+// Version             :    1.0.1 
+// Author              :    Xilin Xia
 // Create Time         :    2014/10/04
-// Update Time         :    2012/10/29
+// Update Time         :    2020/04/26
 // ======================================================================================
-// Copyright @ Xilin Xia 2014 . All rights reserved.
+// LICENCE: GPLv3 
 // ======================================================================================
 
 /*!
