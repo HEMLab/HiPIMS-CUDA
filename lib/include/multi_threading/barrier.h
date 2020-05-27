@@ -1,14 +1,14 @@
 // ======================================================================================
-// Name                :    GeoClasses : Generic Geophysical Flow Modelling Framework
+// Name                :    High-Performance Integrated Modelling System
 // Description         :    This code pack provides a generic framework for developing 
-//                          Geophysical CFD software.
+//                          Geophysical CFD software. Legacy name: GeoClasses
 // ======================================================================================
-// Version             :    1.0
-// Author              :    Xilin Xia (PhD candidate in Newcastle University)
+// Version             :    1.0.1 
+// Author              :    Xilin Xia
 // Create Time         :    2014/10/04
-// Update Time         :    2016/11/24
+// Update Time         :    2020/04/26
 // ======================================================================================
-// Copyright @ Xilin Xia 2014 . All rights reserved.
+// LICENCE: GPLv3 
 // ======================================================================================
 
 /*!

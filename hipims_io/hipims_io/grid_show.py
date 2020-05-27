@@ -23,7 +23,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 #plt.switch_backend('agg')
 import matplotlib.colors as colors
-import hipims_io.spatial_analysis as sp
+from . import spatial_analysis as sp
 from matplotlib import cm
 from matplotlib.colors import ListedColormap
 from matplotlib.patches import Patch
@@ -66,14 +66,7 @@ def mapshow(raster_obj=None, array=None, header=None, ax=None,
 	# create an axes on the right side of ax. The width of cax will be 5%
     # of ax and the padding between cax and ax will be fixed at 0.05 inch.
     if cax==True:
-        divider = make_axes_locatable(ax)
-        cax = divider.append_axes("right", size="3%", pad=0.05)
-        cbar = plt.colorbar(img, cax=cax)
-        plt.yticks(fontsize='small')
-        if cax_str is not None:
-            cbar.ax.set_xlabel(cax_str, horizontalalignment='left',
-                               fontsize='small')
-            cbar.ax.xaxis.set_label_coords(0, 1.06)
+        _ = _set_continous_colorbar(ax, img, cax_str)
     ax.axes.grid(linestyle='-.', linewidth=0.2)
     ax.set_aspect('equal', 'box')
     # save figure
@@ -120,7 +113,7 @@ def rankshow(raster_obj=None, array=None, header=None,
     _adjust_axis_tick(ax, relocate, scale_ratio)
     # create colorbar
     if show_colorbar is True:
-        _set_colorbar(ax, chm_plot, norm)
+        _set_rank_colorbar(ax, chm_plot, norm)
     if show_colorlegend is True: # legend
         _set_color_legend(ax, norm, newcmp)
     if figname is not None:
@@ -128,7 +121,7 @@ def rankshow(raster_obj=None, array=None, header=None,
     return fig, ax
 
 def hillshade(raster_obj, figsize=None, azdeg=315, altdeg=45, vert_exag=1,
-              alpha=1):
+              blend_mode='overlay', alpha=1):
     """ Draw a hillshade map
     """
     array = raster_obj.array+0
@@ -136,8 +129,8 @@ def hillshade(raster_obj, figsize=None, azdeg=315, altdeg=45, vert_exag=1,
     ls = LightSource(azdeg=azdeg, altdeg=altdeg)
     cmap = plt.cm.gist_earth
     fig, ax = plt.subplots(figsize=figsize)
-    rgb = ls.shade(array, cmap=cmap, 
-                   blend_mode='overlay',vert_exag=vert_exag)
+    rgb = ls.shade(array, cmap=cmap, blend_mode=blend_mode, 
+                   vert_exag=vert_exag)
     ax.imshow(rgb, alpha=alpha)
     ax.set_axis_off()
     return fig, ax
@@ -147,7 +140,7 @@ def vectorshow(obj_x, obj_y, figname=None, figsize=None, dpi=300, **kwargs):
     plot velocity map of U and V, whose values stored in two raster
     objects seperately
     """
-    X, Y = obj_x.GetXYcoordinate()        
+    X, Y = obj_x.to_points()        
     U = obj_x.array
     V = obj_y.array
     if U.shape!=V.shape:
@@ -266,7 +259,7 @@ def _plot_temp_figs(obj_list=None, header=None, array_3d=None,
     return fig_names
     
 #%%
-def _set_colorbar(ax, img, norm):
+def _set_rank_colorbar(ax, img, norm):
     divider = make_axes_locatable(ax)
     cax = divider.append_axes("right", size="5%", pad=0.05)
     plt.colorbar(img, cax=cax)
@@ -301,6 +294,22 @@ def _set_color_legend(ax, norm, cmp,
               bbox_to_anchor=bbox_to_anchor,
               facecolor=facecolor)
     return ax
+
+def _set_continous_colorbar(ax, img, cax_str=None,
+                            loc='right', size='3%', pad=0.05,
+                            fontsize='small'):
+    """ Set a continous color bar
+    cbar = _set_continous_colorbar(ax, img, cax_str=None)
+    cax_str: title of color bar
+    """
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes(loc, size=size, pad=pad)
+    cbar = plt.colorbar(img, cax=cax)
+    if cax_str is not None:
+        cbar.ax.set_xlabel(cax_str, horizontalalignment='left',
+                           fontsize=fontsize)
+        cbar.ax.xaxis.set_label_coords(0, 1.06)
+    return cbar
 
 def _adjust_axis_tick(ax, relocate=True, scale_ratio=1):
     """

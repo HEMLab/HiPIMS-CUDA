@@ -8,8 +8,8 @@ Created on Tue Mar 31 16:07:09 2020
 
 @author: Xiaodong Ming
 """
-import warnings
 import numpy as np
+from .rainfall_processing import _check_rainfall_rate_values
 #%% HiPIMS model input information summary
 class ModelSummary:
     """ Store and disply all model information including:
@@ -41,7 +41,7 @@ class ModelSummary:
             'Domain area':'{1:,} m^2 with {0:,} valid cells'.format(
                 num_valid_cells, self.domain_area),
             'Birthday':birthday_str,
-            'Run time':runtime_str,
+            'Runtime(s)':runtime_str,
             '------------':'----Initial Condition----------',
             'h0':'0 for all cells',
             'hU0x':'0 for all cells',
@@ -138,31 +138,3 @@ class ModelSummary:
                 Values_str = ' Values{:}, Ratios'.format(item_numbers)
                 item_value = Values_str+ratio_str
         self.information_dict[item_name] = item_value
-
-def _check_rainfall_rate_values(rain_source, times_in_1st_col=True):
-    """ Check the rainfall rate values in rain source array
-    rain_source: (numpy array) rainfall source array
-          The 1st column is usually time series in seconds, from the 2nd column
-          towards end columns are rainfall rate in m/s
-    times_in_1st_col: indicate whether the first column is times
-    Return:
-        values_max: maximum rainfall rate in mm/h
-        values_mean: average rainfall rate in mm/h
-    """
-    # get the pure rainfall rate values
-    if times_in_1st_col:
-        rain_values = rain_source[:, 1:]
-        time_series = rain_source[:, 0]
-    else:
-        rain_values = rain_source
-        time_series = np.arange(rain_values.shape[0])
-    # convert the unit of rain rate values from m/s to mm/h
-    rain_values_mmh = rain_values*3600*1000
-    values_max = rain_values_mmh.max()
-    values_mean = rain_values.mean(axis=1)
-    rain_total_amount = np.trapz(y=values_mean, x=time_series) # in meter
-    duration = np.ptp(time_series)
-    rain_rate_mean = rain_total_amount*1000/(duration/3600) #mm/h
-    if values_max > 5000 or rain_rate_mean > 1000:
-        warnings.warn('Very large rainfall rates, better check your data!')
-    return values_max, rain_rate_mean
