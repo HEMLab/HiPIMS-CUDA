@@ -275,7 +275,7 @@ int main(){
       time_controller.set_dt(dt);
     }
 
-    if (cnt % 1 == 0){
+    if (cnt % 100 == 0){
       h_writer.write(time_controller.current());
       eta_writer.write(time_controller.current());
 	    hU_writer.write(time_controller.current());
@@ -307,15 +307,15 @@ int main(){
       t_out += dt_out;
     }
     //***********Fuse for extremely small dt***********
-    if (time_controller.dt()<0.0001) {
-      fv::cuUnary(hU, hUx, [] __device__(Vector& a) -> Scalar{ return a.x; });
-      fv::cuUnary(hU, hUy, [] __device__(Vector& a) -> Scalar{ return a.y; });
-      raster_writer.write(h, "h", t_out);
-      raster_writer.write(hUx, "hUx", t_out);
-      raster_writer.write(hUy, "hUy", t_out);
-      printf("Fuse!!!\n");
-      break;
-    }
+    //if (time_controller.dt()<0.0001) {
+    //  fv::cuUnary(hU, hUx, [] __device__(Vector& a) -> Scalar{ return a.x; });
+    //  fv::cuUnary(hU, hUy, [] __device__(Vector& a) -> Scalar{ return a.y; });
+    //  raster_writer.write(h, "h", t_out);
+    //  raster_writer.write(hUx, "hUx", t_out);
+    //  raster_writer.write(hUy, "hUy", t_out);
+    //  printf("Fuse!!!\n");
+    //  break;
+    //}
     //****************************************
     if (time_controller.current() >= backup_time - t_small){
       std::cout << "Writing backup files" << std::endl;
