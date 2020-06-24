@@ -270,6 +270,17 @@ int main(){
     time_controller.forward();
     time_controller.updateByCFL(gravity, h, hU);
 
+    //-----------Fuse for extremely small dt------------ There is a bug to be resolved herein
+    if (time_controller.dt()<0.0001) {
+      fv::cuUnary(hU, hUx, [] __device__(Vector& a) -> Scalar{ return a.x; });
+      fv::cuUnary(hU, hUy, [] __device__(Vector& a) -> Scalar{ return a.y; });
+      raster_writer.write(h, "h", t_out);
+      raster_writer.write(hUx, "hUx", t_out);
+      raster_writer.write(hUy, "hUy", t_out);
+      printf("Fuse!!!\n");
+      break;
+    }
+
     if (time_controller.current() + time_controller.dt() > t_out){
       Scalar dt = t_out - time_controller.current();
       time_controller.set_dt(dt);
@@ -307,16 +318,6 @@ int main(){
       t_out += dt_out;
     }
     
-    //-----------Fuse for extremely small dt------------ There is a bug to be resolved herein
-    //if (time_controller.dt()<0.0001) {
-    //  fv::cuUnary(hU, hUx, [] __device__(Vector& a) -> Scalar{ return a.x; });
-    //  fv::cuUnary(hU, hUy, [] __device__(Vector& a) -> Scalar{ return a.y; });
-    //  raster_writer.write(h, "h", t_out);
-    //  raster_writer.write(hUx, "hUx", t_out);
-    //  raster_writer.write(hUy, "hUy", t_out);
-    //  printf("Fuse!!!\n");
-    //  break;
-    //}
 
     if (time_controller.current() >= backup_time - t_small){
       std::cout << "Writing backup files" << std::endl;
