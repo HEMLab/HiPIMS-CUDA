@@ -1,5 +1,0 @@
-include LICENSE.txt
-include README.md
-include hipims_io/sample/Example_DEM.asc
-include hipims_io/sample/Example_data.npy
-recursive-include hipims_io/sample/*
