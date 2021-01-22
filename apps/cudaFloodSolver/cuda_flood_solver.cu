@@ -60,6 +60,7 @@
 #include "cuda_integrators.h"
 //The header file for device query
 #include "cuda_device_query.h"
+#include "cuda_cal_metric.h"
 //The header file for time controllinh
 #include "cuda_adaptive_time_control.h"
 #include <thrust/device_ptr.h>
@@ -147,9 +148,9 @@ int main(){
   std::cout << "Read in field successfully" << std::endl;
 
   //h, z, hU
-  cuFvMappedField<Scalar, on_cell> z_old(z_host, mesh_ptr_dev);
   cuFvMappedField<Scalar, on_cell> z(z_host,mesh_ptr_dev);
   cuFvMappedField<Scalar, on_cell> h(h_host,mesh_ptr_dev);
+  cuFvMappedField<Scalar, on_cell> h_old(h_host, mesh_ptr_dev);
   cuFvMappedField<Vector, on_cell> hU(hU_host, mesh_ptr_dev);
   cuFvMappedField<Scalar, on_cell> manning_coef(manning_coef_host, mesh_ptr_dev);
   cuFvMappedField<Scalar, on_cell> culmulative_depth(culmulative_depth_host, mesh_ptr_dev);
@@ -161,6 +162,19 @@ int main(){
 
   //maximum innundated depth
   cuFvMappedField<Scalar, on_cell> h_max(h, partial);
+
+  //maximum unit-width discharge
+  cuFvMappedField<Scalar, on_cell> hU_max(h, partial);
+
+  //duration for h > 0.3
+  cuFvMappedField<Scalar, on_cell> t_hGT03(h, partial);
+  cuFvMappedField<Scalar, on_cell> t_hGT03_max(h, partial);
+  //duration for h > 0.5
+  cuFvMappedField<Scalar, on_cell> t_hGT05(h, partial);
+  cuFvMappedField<Scalar, on_cell> t_hGT05_max(h, partial);
+
+  //auxiliary variable for calculating t_hGT
+  cuFvMappedField<Scalar, on_cell> t_aux(h, partial);
 
     //x and y components of hU
   cuFvMappedField<Scalar, on_cell> hUx(h, partial);
@@ -252,6 +266,9 @@ int main(){
     //calculate the surface elevation
     fv::cuBinary(h, z, eta, [] __device__ (Scalar& a, Scalar& b) -> Scalar{return a + b;});
 
+    //store old depth
+    fv::cuUnary(h, h_old, [] __device__(Scalar& a) -> Scalar{ return a; });
+
     //calculate advection
     fv::cuAdvectionMSWEsCartesian(gravity, h, z, z_gradient, hU, h_advection, hU_advection); //SRM
 
@@ -279,6 +296,17 @@ int main(){
 
     //update maximum depth
     fv::cuBinary(h_max, h, h_max, [] __device__(Scalar& a, Scalar b) -> Scalar{ return fmax(a, b); });
+
+    //update maximum hu
+    fv::cuBinary(hU_max, hU, hU_max, [] __device__(Scalar& a, Vector2 b) -> Scalar{ return fmax(a, norm(b)); });
+
+    Scalar dt = time_controller.dt();
+
+    //calculating depth windows
+    cuCalDepthDuration(h_old, h, t_hGT03, 0.3, dt);
+    cuCalDepthDuration(h_old, h, t_hGT05, 0.5, dt);
+    fv::cuBinary(t_hGT03_max, t_hGT03, t_hGT03_max, [] __device__(Scalar& a, Scalar b) -> Scalar{ return fmax(a, b); });
+    fv::cuBinary(t_hGT05_max, t_hGT05, t_hGT05_max, [] __device__(Scalar& a, Scalar b) -> Scalar{ return fmax(a, b); });
 
     //forwarding the time
     time_controller.forward();
@@ -343,7 +371,11 @@ int main(){
 
   } while (!time_controller.is_end());
 
-  printf("Writing maximum inundated depth.\n");
+  printf("Writing maximum data for impact calculations.\n");
+  raster_writer.write(t_hGT03_max, "hU_max", t_all);
+  raster_writer.write(t_hGT05_max, "hU_max", t_all);
+  raster_writer.write(hU_max, "hU_max", t_all);
+  raster_writer.write(h_max, "h_max", t_all);
   raster_writer.write(h_max, "h_max", t_all);
   std::cout << "Total runtime " << total_runtime << "ms" << std::endl;
 
