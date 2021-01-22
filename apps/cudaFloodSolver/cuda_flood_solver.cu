@@ -372,8 +372,8 @@ int main(){
   } while (!time_controller.is_end());
 
   printf("Writing maximum data for impact calculations.\n");
-  raster_writer.write(t_hGT03_max, "hU_max", t_all);
-  raster_writer.write(t_hGT05_max, "hU_max", t_all);
+  raster_writer.write(t_hGT03_max, "t_hGT03_max", t_all);
+  raster_writer.write(t_hGT05_max, "t_hGT05_max", t_all);
   raster_writer.write(hU_max, "hU_max", t_all);
   raster_writer.write(h_max, "h_max", t_all);
   raster_writer.write(h_max, "h_max", t_all);
