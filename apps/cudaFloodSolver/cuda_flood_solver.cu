@@ -119,6 +119,14 @@ int main(){
     
   cuAdaptiveTimeControl2D time_controller(0.005, t_all, 0.5, t_current);
 
+  while(t_out < t_current){
+    t_out += dt_out;
+  }
+
+  while(backup_time < t_current){
+    backup_time += backup_interval;
+  }
+
   std::shared_ptr<unstructuredFvMesh>  mesh = std::make_shared<CartesianFvMesh>("input/mesh/DEM.txt");
 
   std::cout << "Read in mesh successfully" << std::endl;
