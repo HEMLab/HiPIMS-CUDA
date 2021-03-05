@@ -47,4 +47,32 @@ namespace GC{
 
   }
 
+  __global__ void cuCalHazardRatingKernel(Scalar* h, Vector* hU, Scalar* hRating, unsigned int phi_size){
+
+    unsigned int index = blockDim.x * blockIdx.x + threadIdx.x;
+    while(index < phi_size){
+      Scalar h_ = h[index];
+      Vector2 hU_ = hU[index];
+      Scalar debris_factor = 0.0;
+      if(h_> 0.25){
+        debris_factor = 1.0;
+      }else{
+        debris_factor = 0.5;
+      }
+      Scalar h_rating = norm(hU_) + 0.5*h_ + debris_factor;
+      hRating[index] = h_rating;
+      index += blockDim.x * gridDim.x;
+    }
+
+  }
+
+  void cuCalHazardRating(cuFvMappedField<Scalar, on_cell>& h, cuFvMappedField<Vector, on_cell>& hU, cuFvMappedField<Scalar, on_cell>& hRating){
+
+    cuCalHazardRatingKernel << <BLOCKS_PER_GRID, THREADS_PER_BLOCK >> >(h.data.dev_ptr(),
+    hU.data.dev_ptr(),
+    hRating.data.dev_ptr(),
+    h.data.size());
+
+  }
+
 }
