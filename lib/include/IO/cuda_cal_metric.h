@@ -31,4 +31,10 @@ namespace GC{
 
 }
 
+namespace GC{
+  
+  void cuCalHazardRating(cuFvMappedField<Scalar, on_cell>& h, cuFvMappedField<Vector, on_cell>& hU, cuFvMappedField<Scalar, on_cell>& hRating);
+
+}
+
 #endif

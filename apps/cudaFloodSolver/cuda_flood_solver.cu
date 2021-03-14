@@ -181,8 +181,12 @@ int main(){
   cuFvMappedField<Scalar, on_cell> t_hGT05(h, partial);
   cuFvMappedField<Scalar, on_cell> t_hGT05_max(h, partial);
 
+  //hazard ratings
+  cuFvMappedField<Scalar, on_cell> hRating(h, partial);
+  cuFvMappedField<Scalar, on_cell> hRating_max(h, partial);
+
   //auxiliary variable for calculating t_hGT
-  cuFvMappedField<Scalar, on_cell> t_aux(h, partial);
+  //cuFvMappedField<Scalar, on_cell> t_aux(h, partial);
 
     //x and y components of hU
   cuFvMappedField<Scalar, on_cell> hUx(h, partial);
@@ -316,6 +320,10 @@ int main(){
     fv::cuBinary(t_hGT03_max, t_hGT03, t_hGT03_max, [] __device__(Scalar& a, Scalar b) -> Scalar{ return fmax(a, b); });
     fv::cuBinary(t_hGT05_max, t_hGT05, t_hGT05_max, [] __device__(Scalar& a, Scalar b) -> Scalar{ return fmax(a, b); });
 
+    //calculating hazard rating
+    cuCalHazardRating(h, hU, hRating);
+    fv::cuBinary(hRating_max, hRating, hRating_max, [] __device__(Scalar& a, Scalar b) -> Scalar{ return fmax(a, b); });
+
     //forwarding the time
     time_controller.forward();
     time_controller.updateByCFL(gravity, h, hU);
@@ -383,6 +391,7 @@ int main(){
   raster_writer.write(t_hGT03_max, "t_hGT03_max", t_all);
   raster_writer.write(t_hGT05_max, "t_hGT05_max", t_all);
   raster_writer.write(hU_max, "hU_max", t_all);
+  raster_writer.write(hRating_max, "hRating_max", t_all);
   raster_writer.write(h_max, "h_max", t_all);
   raster_writer.write(h_max, "h_max", t_all);
   std::cout << "Total runtime " << total_runtime << "ms" << std::endl;
