@@ -70,9 +70,9 @@ namespace GC{
       unsigned int lower_end_id = (*(bank.banks)[domain_id]).indices_lower2send.back();
       int dev_id_target = device_list[domain_id - 1];
       checkCuda(cudaSetDevice(dev_id_target));
-      checkCuda(cudaDeviceEnablePeerAccess(dev_id_src, 0));
+      //checkCuda(cudaDeviceEnablePeerAccess(dev_id_src, 0));
       checkCuda(cudaSetDevice(dev_id_src));
-      checkCuda(cudaDeviceEnablePeerAccess(dev_id_target, 0));
+      //checkCuda(cudaDeviceEnablePeerAccess(dev_id_target, 0));
       void* p_bank = thrust::raw_pointer_cast((*(bank.banks)[domain_id - 1]).data_upper.data()); //target: upper
       while (true){ //keep trying until the bank is empty
         if ((*(bank.banks)[domain_id - 1]).upper_status == 0){ //upper bank of a lower domain is empty
@@ -88,9 +88,9 @@ namespace GC{
       unsigned int upper_end_id = (*(bank.banks)[domain_id]).indices_upper2send.back();
       int dev_id_target = device_list[domain_id + 1];
       checkCuda(cudaSetDevice(dev_id_target));
-      checkCuda(cudaDeviceEnablePeerAccess(dev_id_src, 0));
+      //checkCuda(cudaDeviceEnablePeerAccess(dev_id_src, 0));
       checkCuda(cudaSetDevice(dev_id_src));
-      checkCuda(cudaDeviceEnablePeerAccess(dev_id_target, 0));
+      //checkCuda(cudaDeviceEnablePeerAccess(dev_id_target, 0));
       void* p_bank = thrust::raw_pointer_cast((*(bank.banks)[domain_id + 1]).data_lower.data()); //target:: lower
       while (true){ //keep trying until the bank is empty
         if ((*(bank.banks)[domain_id + 1]).lower_status == 0){ //lower bank of a upper domain is empty

@@ -117,6 +117,11 @@ namespace GC{
       (*banks[i]).indices_upper2receive = _indices_upper2receive;
       (*banks[i]).indices_upper2send = _indices_upper2send;
     }
+    //Enable peer-2-peer access at the beginning
+    for (unsigned int i = 0; i < num_domains; i++){
+      int dev_id = device_list[i];
+      checkCuda(cudaDeviceEnablePeerAccess(dev_id, 0));
+    }
 
   }
 
