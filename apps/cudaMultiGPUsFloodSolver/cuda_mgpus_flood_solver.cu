@@ -214,7 +214,7 @@ void run(cuDataBank& bank, std::vector<int> device_list, unsigned int domain_id,
   
   //print current time
   if (domain_id == 0){
-    printf("%f\n", time_controller.current());
+    printf("%d %f %f\n", cnt, time_controller.dt(), time_controller.current());
   }
   
   auto momentum_filter = [] __device__(Vector& a, Scalar& b) ->Vector{
@@ -244,14 +244,23 @@ void run(cuDataBank& bank, std::vector<int> device_list, unsigned int domain_id,
     }
   };
 
-  //auto manning_filter= [] __device__(Scalar& a, Vector& b ) ->Scalar{
-  //  if (norm(b) > 10.0){
-  //    return 2.0*a;
-  //  }
-  //  else{
-  //    return a;
-  //  }
-  //};
+  auto manning_filter= [] __device__(Scalar& a, Vector& b ) ->Scalar{
+    if (norm(b) > 10.0){
+      return fmin(2.0*a, 0.3);
+    }
+    else{
+      return a;
+    }
+  };
+
+  auto gradient_filter= [] __device__(Vector2& a, Vector2& b ) ->Vector2{
+    if (norm(b) > 10.0){
+      return Vector2(0.0, 0.0);
+    }
+    else{
+      return a;
+    }
+  };
 
   h.update_boundary_source(field_directory.c_str(), "h");
   hU.update_boundary_source(field_directory.c_str(), "hU");
@@ -298,6 +307,7 @@ void run(cuDataBank& bank, std::vector<int> device_list, unsigned int domain_id,
     //modify manning coefficient to filter large velocities
     fv::cuBinary(hU, h, u, divide);
     //fv::cuBinary(manning_coef,u,manning_coef,manning_filter);
+    fv::cuBinary(z_gradient,u,z_gradient,gradient_filter);
 
     ////forwarding the time
     time_controller.forward();
@@ -310,7 +320,7 @@ void run(cuDataBank& bank, std::vector<int> device_list, unsigned int domain_id,
 
     //print current time
     if (domain_id == 0){
-      printf("%f\n", time_controller.current());
+      printf("%d %f %f\n", cnt, time_controller.dt(), time_controller.current());
       fout << time_controller.current() << " " << time_controller.dt() << std::endl;
     }
 
