@@ -23,7 +23,7 @@ The individuals listed below have contributed to this open-source project by fun
 
 # References
 
-The implementation of this code is documented the following papers
+The implementation of this code is documented in the following papers
 
 Xia X, Liang Q, Ming X (2019) A full-scale fluvial flood modelling framework based on a high-performance integrated hydrodynamic modelling system (HiPIMS). Advances in Water Resources, 132: 103392.
 
