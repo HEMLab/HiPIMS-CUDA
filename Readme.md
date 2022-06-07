@@ -17,7 +17,7 @@ The individuals listed below have contributed to this open-source project by fun
 
 - [Qiuhua Liang](https://www.lboro.ac.uk/departments/abce/staff/qiuhua-liang/), (q.liang@lboro.ac.uk)
 
-- [Xilin Xia](https://www.lboro.ac.uk/departments/abce/staff/xilin-xia/), (x.xia2@lboro.ac.uk)
+- [Xilin Xia](https://xilinxia.com/), (x.xia.1@bham.ac.uk)
 
 - [Xiaodong Ming](https://www.lboro.ac.uk/departments/abce/staff/xiaodong-ming/), (x.ming@lboro.ac.uk)
 
