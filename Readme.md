@@ -7,7 +7,7 @@ GPUs (Graphics Processing Unit) using CUDA/C++ languages to achieve high-perform
 
 # Using HiPIMS
 
-HiPIMS has been embedded in **[Pypims](https://pypi.org/project/pypims/)**, the Python APIs for hipims, which provides a user-friendly and powerful interface for data pre-processing, running hipims and result visualisation.
+HiPIMS has been embedded in **[Pypims](https://pypims.readthedocs.io/en/latest/)**, the Python APIs for hipims, which provides an user-friendly integrated toolchain for preparing inputs, running hipims and visualising outputs.
 
 # Contributing
 
