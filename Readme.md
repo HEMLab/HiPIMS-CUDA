@@ -13,7 +13,7 @@ HiPIMS has been embedded in **[Pypims](https://pypims.readthedocs.io/en/latest/)
 
 HiPIMS is maintained by **[The University of Birmingham](https://www.birmingham.ac.uk/schools/engineering/civil-engineering/index.aspx)** and the **[Hydro-Environmental Modelling Labarotory](http://www.hemlab.org)**, a research hub for technological innovation and interdisciplinary collaboration. We welcome the hydro-environmental modelling community to contribute to the project, believing that this project will benefit the whole community.
 
-The individuals who have contributed directly to the code can be found in the list of **[contributors](https://github.com/HEMLab/hipims/graphs/contributors)**. The development of the model has also benefited from estensive usage and testing, which were funded UKRI, The Met Office and The Royal Society, and contributed by numerous researchsers. 
+The individuals who have contributed directly to the code can be found in the list of **[contributors](https://github.com/HEMLab/hipims/graphs/contributors)**. The development of the model has also benefited from estensive usage and testing, which were funded by UKRI, The Met Office and The Royal Society, and contributed by numerous researchsers. 
 
 # References
 
