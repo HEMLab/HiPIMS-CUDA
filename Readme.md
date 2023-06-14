@@ -9,17 +9,11 @@ GPUs (Graphics Processing Unit) using CUDA/C++ languages to achieve high-perform
 
 HiPIMS has been embedded in **[Pypims](https://pypims.readthedocs.io/en/latest/)**, the Python APIs for hipims, which provides an user-friendly integrated toolchain for preparing inputs, running hipims and visualising outputs.
 
-# Contributing
+# Contributing and Acknowledgement
 
-HiPIMS is maintained by the **[Hydro-Environmental Modelling Labarotory](http://www.hemlab.org)**, a research hub for technological innovation and interdisciplinary collaboration. We warmly welcome the hydro-environmental modelling community to contribute to the project, believing that this project will benefit the whole community.
+HiPIMS is maintained by **[The University of Birmingham](https://www.birmingham.ac.uk/schools/engineering/civil-engineering/index.aspx)** and the **[Hydro-Environmental Modelling Labarotory](http://www.hemlab.org)**, a research hub for technological innovation and interdisciplinary collaboration. We welcome the hydro-environmental modelling community to contribute to the project, believing that this project will benefit the whole community.
 
-The individuals listed below have contributed to this open-source project by fund acquisition, supervision, developing numerical schemes and contributing to the code.
-
-- [Qiuhua Liang](https://www.lboro.ac.uk/departments/abce/staff/qiuhua-liang/), (q.liang@lboro.ac.uk)
-
-- [Xilin Xia](https://xilinxia.com/), (x.xia.1@bham.ac.uk)
-
-- [Xiaodong Ming](https://www.lboro.ac.uk/departments/abce/staff/xiaodong-ming/), (x.ming@lboro.ac.uk)
+The individuals who have contributed directly to the code can be found in the list of **[contributors](https://github.com/HEMLab/hipims/graphs/contributors)**. The development of the model has also benefited from estensive usage and testing, which were funded UKRI, The Met Office and The Royal Society, and contributed by numerous researchsers. 
 
 # References
 
@@ -33,7 +27,7 @@ Xia X, Liang Q, Ming X, Hou J (2017) An efficient and stable hydrodynamic model 
 
 Xia X, Liang Q (2018) A new depth-averaged model for flow-like landslides over complex terrains with curvatures and steep slopes. Engineering Geology, 234: 174-191.
 
-A full list of related publications can be found [here](https://github.com/HEMLab/hipims/wiki/References). Please cite appropriate papers if you use hipims for your project.
+The research that underpins HiPIMS are efforts of nearly two decades and many reseachers. A full list of related publications can be found [here](https://github.com/HEMLab/hipims/wiki/References). Please cite appropriate papers if you use hipims for your project.
 
 # License
 
