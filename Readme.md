@@ -17,6 +17,7 @@ The individuals who have contributed directly to the code can be found in the li
 - Qiuhua Liang
 - Xilin Xia
 - Xiaodong Ming
+
 The development of the model is underpinned by two decades of research and has benefited from extensive testing, for which many individuals have made significant contributions. The research have been funded by UKRI, The Met Office and The Royal Society.
 
 # References
