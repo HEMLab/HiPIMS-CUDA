@@ -13,7 +13,16 @@ HiPIMS has been embedded in **[Pypims](https://pypims.readthedocs.io/en/latest/)
 
 HiPIMS is maintained by **[The University of Birmingham](https://www.birmingham.ac.uk/schools/engineering/civil-engineering/index.aspx)** and the **[Hydro-Environmental Modelling Labarotory](http://www.hemlab.org)**, a research hub for technological innovation and interdisciplinary collaboration. We welcome the hydro-environmental modelling community to contribute to the project, believing that this project will benefit the whole community.
 
-The individuals who have contributed directly to the code can be found in the list of **[contributors](https://github.com/HEMLab/hipims/graphs/contributors)**. The development of the model has also benefited from estensive usage and testing, which were funded by UKRI, The Met Office and The Royal Society, and contributed by numerous researchsers. 
+The individuals who have contributed directly to the code can be found in the list of **[contributors](https://github.com/HEMLab/hipims/graphs/contributors)**. The development of the model is underpinned by two decades of research and has benefited from estensive testing, for which the following individuals have made significant contributions:
+
+- Qiuhua Liang
+- Xilin Xia
+- Xiaodong Ming
+- Kristine Jarsve
+- Jinghua Jiang
+- Xiaoli Su
+
+The research have been funded by UKRI, The Met Office and The Royal Society.
 
 # References
 
@@ -27,7 +36,7 @@ Xia X, Liang Q, Ming X, Hou J (2017) An efficient and stable hydrodynamic model 
 
 Xia X, Liang Q (2018) A new depth-averaged model for flow-like landslides over complex terrains with curvatures and steep slopes. Engineering Geology, 234: 174-191.
 
-The research that underpins HiPIMS are efforts of nearly two decades and many reseachers. A full list of related publications can be found [here](https://github.com/HEMLab/hipims/wiki/References). Please cite appropriate papers if you use hipims for your project.
+A full list of related publications can be found [here](https://github.com/HEMLab/hipims/wiki/References). Please cite appropriate papers if you use hipims for your project.
 
 # License
 
