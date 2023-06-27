@@ -13,7 +13,11 @@ HiPIMS has been embedded in **[Pypims](https://pypims.readthedocs.io/en/latest/)
 
 HiPIMS is maintained by the **[Hydro-Environmental Modelling Labarotory](http://www.hemlab.org)**, a research hub for technological innovation and interdisciplinary collaboration. We welcome the hydro-environmental modelling community to contribute to the project, believing that this project will benefit the whole community.
 
-The individuals who have contributed directly to the code can be found in the list of **[contributors](https://github.com/HEMLab/hipims/graphs/contributors)**. The development of the model is underpinned by two decades of research and has benefited from estensive testing, for which the many individuals have made significant contributions. The research have been funded by UKRI, The Met Office and The Royal Society.
+The individuals who have contributed directly to the code can be found in the list:
+- Qiuhua Liang
+- Xilin Xia
+- Xiaodong Ming
+The development of the model is underpinned by two decades of research and has benefited from extensive testing, for which many individuals have made significant contributions. The research have been funded by UKRI, The Met Office and The Royal Society.
 
 # References
 
