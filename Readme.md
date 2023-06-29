@@ -13,6 +13,12 @@ HiPIMS has been embedded in **[Pypims](https://pypims.readthedocs.io/en/latest/)
 
 HiPIMS is developed and maintained by the **[Hydro-Environmental Modelling Labarotory](http://www.hemlab.org)**, a research hub initiated by Professor  [Qiuhua Liang](https://www.lboro.ac.uk/departments/abce/staff/qiuhua-liang/) for technological innovation and interdisciplinary collaboration. The research that underpins HiPIMS represents the effort of nearly two decades and many researchers. A full list of related publications can be found [here](https://github.com/HEMLab/hipims/wiki/References). We welcome the hydro-environmental modelling community to contribute to the project, believing that this project will benefit the whole community. 
 
+## 贡献者
+
+{% for contributor in contributors %}
+![{{ contributor.username }}]({{ contributor.avatar_url }})  
+[{{ contributor.username }}](https://github.com/{{ contributor.username }})  
+{% endfor %}
 
 # References
 
