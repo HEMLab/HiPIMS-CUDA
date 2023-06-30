@@ -33,4 +33,4 @@ The code is licensed under GPLv3. Please see LICENCE for more information.
 
 # Contact us
 
-For more information, please contact [Xiaoli Su] (mailto:x.su@lboro.ac.uk), [Jinghua Jiang] (mailto:j.jiang3@lboro.ac.uk), [Huili Chen] (mailto:H.Chen2@lboro.ac.uk), or [Xue Tong](mailto:x.tong2@lboro.ac.uk).
+For more information, please contact [Xiaoli Su](mailto:x.su@lboro.ac.uk), [Jinghua Jiang](mailto:j.jiang3@lboro.ac.uk), [Huili Chen](mailto:H.Chen2@lboro.ac.uk), or [Xue Tong](mailto:x.tong2@lboro.ac.uk).
