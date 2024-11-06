@@ -1,0 +1,9 @@
+Package: my-cpp-project
+Version: 1.0
+Section: utils
+Priority: optional
+Architecture: amd64
+Depends: libc6 (>= 2.30)
+Maintainer: Your Name <your.email@example.com>
+Description: A simple C++ project that prints "Hello, World!" to the console.
+ This is a simple demonstration project for packaging C++ code into a .deb package.
