@@ -1,9 +1,9 @@
-name: Building For Windows
+name: Building For Windows 🪟
 
 on:
-  #push:
-  #  branches:
-  #    - master
+  push:
+    branches:
+      - master
   pull_request:
     branches:
       - master
@@ -13,7 +13,7 @@ env:
 
 jobs:
   BuildForWindows:
-    name: '🪟 Build for Windows'
+    name: 🪟 Build for Windows
     runs-on: windows-latest
     env:
       CUDA_PATH: "C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.6"
@@ -30,29 +30,29 @@ jobs:
       with:
         fetch-depth: 1
     
-    - name: 'Get Nvdia Driver Cache'
+    - name: ♻️ Get Nvdia Driver Cache
       id: cache-nvdia
       uses: actions/cache@v4
       with:
         path: nvidia_toolkit_cache
         key: nvidia-toolkit-${{ env.NVIDA_DRIVER_FILE_NAME }}
     
-    - name: Download Nvidia Driver
+    - name: ⬇️ Download Nvidia Driver
       if: steps.cache-nvdia.outputs.cache-hit != 'true'
       run: Invoke-WebRequest -Uri $env:NVIDA_DRIVER_URL -OutFile $env:NVIDA_DRIVER_FILE_NAME
       
-    - name: '🧰 Install Nvidia Driver'
+    - name: ⚙️ Install Nvidia Driver
       if: steps.cache-nvdia.outputs.cache-hit != 'true'
       run: |
         Start-Process -FilePath $env:NVIDA_DRIVER_FILE_NAME -ArgumentList $env:NVIDA_INSTALL_ARGS -Wait -NoNewWindow
       
-    - name: 'Setup for Cache Nvidia Driver'
+    - name: 🗄️Setup for Cache Nvidia Driver
       if: steps.cache-nvdia.outputs.cache-hit != 'true'
       run: |
         mkdir -p "nvidia_toolkit_cache"
         xcopy "C:\Program Files\NVIDIA GPU Computing Toolkit\" "nvidia_toolkit_cache\" /s /e /y
       
-    - name: Cache Nvidia Driver
+    - name: 💾 Cache Nvidia Driver
       id: cache-primes-save
       if: steps.cache-nvdia.outputs.cache-hit != 'true'
       uses: actions/cache/save@v4
@@ -60,47 +60,44 @@ jobs:
         path: nvidia_toolkit_cache
         key: nvidia-toolkit-${{ env.NVIDA_DRIVER_FILE_NAME }}
 
-    - name: 'Restore NVIDIA Toolkit from cache'
+    - name: 🔄 Restore NVIDIA Toolkit from cache
       if: steps.cache-nvdia.outputs.cache-hit == 'true'
       run: |
         xcopy "nvidia_toolkit_cache\" "C:\Program Files\NVIDIA GPU Computing Toolkit\" /s /e /y
         xcopy "nvidia_toolkit_cache\CUDA\v12.6\extras\visual_studio_integration\MSBuildExtensions\" "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Microsoft\VC\v170\BuildCustomizations\" /s /e /y
     
     - shell: bash
-      name: Add Nvidia to path
+      name: 🛠️ Add Nvidia to path
       run: |
         echo "CUDA_PATH=$CUDA_PATH" >> $GITHUB_ENV
         echo "CUDA_PATH_V12_6=$CUDA_PATH_V12_6" >> $GITHUB_ENV
         echo "CUDA_PATH_VX_Y=$CUDA_PATH_VX_Y" >> $GITHUB_ENV
         echo "$CUDA_PATH_BIN" >> $GITHUB_PATH
        
-    - name: '🏗️ Configure CMake'
+    - name: 🏗️ Configure CMake
       run: |
         cmake -B ${{github.workspace}}\build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
       
-    - name: '🛠️ Build'
+    - name: 🛠️ Build
       run: cmake --build ${{github.workspace}}\build --config ${{env.BUILD_TYPE}} -j 4
     
-    - name: '⬆️ Upload Exe File'
+    - name: ⬆️ Upload Exe File
       uses: actions/upload-artifact@v4
       with:
         name: binariesArtifact
         path: "${{github.workspace}}\\release\\bin\\Release"
 
   ReleaseArtifact:
-    name: '🚀 Release Project'
+    name: 🚀 Release Project
     runs-on: ubuntu-latest
     needs: BuildForWindows
     steps:
-    - name: '⬇️ Download exe'
+    - name: ⬇️ Download exe
       uses: actions/download-artifact@v4
       with:
         name: binariesArtifact
-        
-    - name: '📃 Output Current Files'
-      run: ls -R
 
-    - name: '🏷️ Add binaries to Release Tag'
+    - name: 📦 Add binaries to Release Tag
       uses: softprops/action-gh-release@v2
       with:
         tag_name: Continuous
