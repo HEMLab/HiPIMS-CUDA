@@ -1,0 +1,16 @@
+Package: hipims-cuda
+Version: 1.0
+Section: utils
+Priority: optional
+Architecture: amd64
+Depends: libc6 (>= 2.30)
+Maintainer: HIPIMS
+Description: HiPIMS is a high-performance GPU-based flood simulation system.
+ HiPIMS standards for High-Performance Integrated hydrodynamic Modelling System.
+ It uses state-of-art numerical schemes (Godunov-type finite volume) to solve the
+ 2D shallow water equations for flood simulations. To support high-resolution flood
+ simulations, HiPIMS is implemented on multiple GPUs (Graphics Processing Units)
+ using CUDA/C++ languages to achieve high-performance computing. Since HiPIMS has
+ a modular and flexible structure, it has great potential to be further developed
+ for other applications in hydrological science as long as the problem can be solved
+ on a uniform rectangular grid.

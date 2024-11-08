@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.10)
 
 # nvcc flags                                                                                                             
 
@@ -28,6 +28,6 @@ else()
 include_directories(${GC_INCLUDE_DIRS})
 add_library(lib STATIC ${gc_srcs})
 #cuda_add_library(cuda_lib STATIC ${gc_cuda_srcs})
-cuda_add_library(cuda_lib  STATIC ${gc_cuda_srcs})
+add_library(cuda_lib  STATIC ${gc_cuda_srcs})
 
 endif()

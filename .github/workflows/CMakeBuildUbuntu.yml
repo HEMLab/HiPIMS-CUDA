@@ -1,0 +1,71 @@
+﻿name: Building For Ubuntu 🐧
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+env:
+  BUILD_TYPE: Release
+  packageName: hipims-cuda-amd64.deb
+
+jobs:
+  BuildForUbuntu:
+    name: 🐧 Build for Ubuntu
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 1
+    
+    - name: ♻️ Get Nvdia Driver Cache
+      uses: Jimver/cuda-toolkit@v0.2.18
+      id: cuda-toolkit
+      with:
+        method: network
+        sub-packages: '["nvcc"]'
+      
+    - name: 🏗️ Configure CMake
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+    
+    - name: 🛠️ Build
+      run: |
+          cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} -j 4
+    
+    - name: 🗄️ Set up Debian Package
+      run: |
+        mkdir -p debian/usr/local/bin
+        cp release/bin/* debian/usr/local/bin/
+    
+    - name: 🔨 Build Debian Package
+      run: |
+        dpkg-deb --build debian ${{env.packageName}}
+    
+    - name: ⬆️ Upload deb package
+      uses: actions/upload-artifact@v4
+      with:
+        name: debArtifact
+        path: "${{github.workspace}}/${{env.packageName}}"
+
+  ReleaseArtifact:
+    name: 🚀 Release Project
+    runs-on: ubuntu-latest
+    needs: BuildForUbuntu
+    steps:
+    - name: ⬇️ Download deb
+      uses: actions/download-artifact@v4
+      with:
+        name: debArtifact
+
+    - name: 📦 Add binaries to Release Tag
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: Continuous
+        files: |
+          ${{env.packageName}}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

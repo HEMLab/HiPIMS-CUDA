@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.10)
 
 set(EXE hipims-landslide)
 set(SRCS cuda_integrated_shallow_flow_solver.cu)
@@ -17,7 +17,7 @@ list(REMOVE_DUPLICATES GC_INCLUDE_DIRS)
 
 include_directories(${GC_INCLUDE_DIRS})
 
-cuda_add_executable(${EXE} ${SRCS})
+add_executable(${EXE} ${SRCS})
 add_dependencies(${EXE} lib cuda_lib)
 
 #set (CUDA_NVCC_FLAGS "-arch=sm_20")
